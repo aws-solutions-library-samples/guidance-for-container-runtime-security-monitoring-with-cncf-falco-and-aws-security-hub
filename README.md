@@ -2,7 +2,7 @@
 
 The project deploys a Lambda function, that enables receiving Falco security findings from AWS CloudWatch logs, formatting them in ASFF JSON format and integrating into Security Hub
 
-The `cdk.json` file instructs the CDK Toolkit how to execute your app - updated for CDK 2.0 per: https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html.
+The `cdk.json` file instructs the CDK Toolkit how to execute your application. It was updated for CDK 2.0 per document: https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html.
 
 This project is set up like a standard Python project.  The initialization
 process also creates a virtualenv within this project, stored under the `.venv`
@@ -59,5 +59,5 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## License
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE)file.
 
