@@ -1,0 +1,294 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.185.0"
+        }
+      },
+      "AwsSecurityhubFalcoEcsEksIntegrationStack": {
+        "id": "AwsSecurityhubFalcoEcsEksIntegrationStack",
+        "path": "AwsSecurityhubFalcoEcsEksIntegrationStack",
+        "children": {
+          "CustomRole": {
+            "id": "CustomRole",
+            "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CustomRole",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CustomRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.185.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CustomRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CustomRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "ec2:DescribeInstances",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": "ecs:DescribeTasks",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": "securityhub:BatchImportFindings",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "CustomRoleDefaultPolicyC5C189DF",
+                        "roles": [
+                          {
+                            "Ref": "CustomRole6D8E6809"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                      "version": "1.185.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Policy",
+                  "version": "1.185.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.185.0"
+            }
+          },
+          "lambda_function": {
+            "id": "lambda_function",
+            "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/lambda_function",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/lambda_function/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/lambda_function/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.AssetStaging",
+                      "version": "1.185.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/lambda_function/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3.BucketBase",
+                      "version": "1.185.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3-assets.Asset",
+                  "version": "1.185.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/lambda_function/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Ref": "AssetParameters9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8S3Bucket7B0181A0"
+                      },
+                      "s3Key": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            {
+                              "Fn::Select": [
+                                0,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8S3VersionKeyF923D144"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Fn::Select": [
+                                1,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8S3VersionKeyF923D144"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    },
+                    "role": {
+                      "Fn::GetAtt": [
+                        "CustomRole6D8E6809",
+                        "Arn"
+                      ]
+                    },
+                    "handler": "falco-security-hub-int.lambda_handler",
+                    "runtime": "python3.7"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-lambda.CfnFunction",
+                  "version": "1.185.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-lambda.Function",
+              "version": "1.185.0"
+            }
+          },
+          "AssetParameters": {
+            "id": "AssetParameters",
+            "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/AssetParameters",
+            "children": {
+              "9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8": {
+                "id": "9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/AssetParameters/9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8",
+                "children": {
+                  "S3Bucket": {
+                    "id": "S3Bucket",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/AssetParameters/9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8/S3Bucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.185.0"
+                    }
+                  },
+                  "S3VersionKey": {
+                    "id": "S3VersionKey",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/AssetParameters/9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8/S3VersionKey",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.185.0"
+                    }
+                  },
+                  "ArtifactHash": {
+                    "id": "ArtifactHash",
+                    "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/AssetParameters/9be3e11cab59672e205cf17d998b81e1c9fd28481d31083a0e1b74df0b9b59a8/ArtifactHash",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.185.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.185.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.185.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.185.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "AwsSecurityhubFalcoEcsEksIntegrationStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.185.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.185.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.185.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.185.0"
+    }
+  }
+}

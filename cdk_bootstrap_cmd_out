@@ -1,0 +1,49 @@
+cdk bootstrap aws://133776528597/us-west-1
+ ⏳  Bootstrapping environment aws://133776528597/us-west-1...
+Trusted accounts for deployment: (none)
+Trusted accounts for lookup: (none)
+Using default execution policy of 'arn:aws:iam::aws:policy/AdministratorAccess'. Pass '--cloudformation-execution-policies' to customize.
+CDKToolkit: creating CloudFormation changeset...
+ ✅  Environment aws://133776528597/us-west-1 bootstrapped.
+
+IAM Statement Changes
+┌───┬───────────────────┬────────┬─────────────────────────────────┬──────────────────────────────┬───────────┐
+│   │ Resource          │ Effect │ Action                          │ Principal                    │ Condition │
+├───┼───────────────────┼────────┼─────────────────────────────────┼──────────────────────────────┼───────────┤
+│ + │ ${CustomRole.Arn} │ Allow  │ sts:AssumeRole                  │ Service:lambda.amazonaws.com │           │
+├───┼───────────────────┼────────┼─────────────────────────────────┼──────────────────────────────┼───────────┤
+│ + │ *                 │ Allow  │ ec2:DescribeInstances           │ AWS:${CustomRole}            │           │
+│ + │ *                 │ Allow  │ ecs:DescribeTasks               │ AWS:${CustomRole}            │           │
+│ + │ *                 │ Allow  │ securityhub:BatchImportFindings │ AWS:${CustomRole}            │           │
+└───┴───────────────────┴────────┴─────────────────────────────────┴──────────────────────────────┴───────────┘
+IAM Policy Changes
+┌───┬───────────────┬────────────────────────────────────────────────────────────────────────────────┐
+│   │ Resource      │ Managed Policy ARN                                                             │
+├───┼───────────────┼────────────────────────────────────────────────────────────────────────────────┤
+│ + │ ${CustomRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole │
+└───┴───────────────┴────────────────────────────────────────────────────────────────────────────────┘
+(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+
+Do you wish to deploy these changes (y/n)? arn:aws:cloudformation:us-west-1:133776528597:stack/AwsSecurityhubFalcoEcsEksIntegrationStack/4bfbc330-9d3d-11ed-b67e-02072dd11413
+
+cdk deploy >> cdk_bootstrap_cmd_out
+
+✨  Synthesis time: 1.64s
+
+This deployment will make potentially sensitive changes according to your current security approval level (--require-approval broadening).
+Please confirm you intend to make the following modifications:
+
+yes
+AwsSecurityhubFalcoEcsEksIntegrationStack: deploying... [1/1]
+[0%] start: Building and publishing 6e24add9a8784c8e41647b242734bbf28a16809c47b8f882e77dbc63bc02b4ac:current
+[100%] success: Built and published 6e24add9a8784c8e41647b242734bbf28a16809c47b8f882e77dbc63bc02b4ac:current
+AwsSecurityhubFalcoEcsEksIntegrationStack: creating CloudFormation changeset...
+
+ ✅  AwsSecurityhubFalcoEcsEksIntegrationStack
+
+✨  Deployment time: 57.78s
+
+Stack ARN:
+
+✨  Total time: 59.42s
+

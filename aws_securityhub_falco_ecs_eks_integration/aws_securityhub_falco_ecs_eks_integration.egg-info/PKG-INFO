@@ -1,3 +1,22 @@
+Metadata-Version: 2.1
+Name: aws-securityhub-falco-ecs-eks-integration
+Version: 0.0.2
+Summary: An empty CDK Python app
+Author: author
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers-DevOps
+Classifier: Programming Language :: JavaScript
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Utilities
+Classifier: Typing :: Typed
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 ## Custom integration for Falco security findings from Amazon Elastic Kubernetes Service (Amazon EKS) and Amazon Elastic Container Service (Amazon ECS), into AWS Security Hub
 
 The project deploys a Lambda function, that enables receiving Falco security findings from AWS CloudWatch logs, formatting them in ASFF JSON format and integrating into Security Hub
