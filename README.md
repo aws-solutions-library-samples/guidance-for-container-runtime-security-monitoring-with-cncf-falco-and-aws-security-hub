@@ -24,7 +24,7 @@ steps to activate your virtualenv:
 $ source .venv/bin/activate
 ```
 
-If you are a Windows platform, you would activate the virtualenv like this:
+If you are running the samepl on a Windows platform, you would activate the virtualenv like this:
 
 ```
 % .venv\Scripts\activate.bat
@@ -43,7 +43,7 @@ $ cdk synth
 ```
 
 To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
+them to the `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
 ## Useful commands
@@ -55,9 +55,9 @@ command.
  * `cdk docs`        open CDK documentation
 ## Security
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+See [CONTRIBUTING] (CONTRIBUTING.md#security-issue-notifications) for more information.
 
 ## License
 
-This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE)file.
+This library is licensed under the MIT-0 License. See the [LICENSE] (LICENSE)file.
 
