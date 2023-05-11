@@ -671,8 +671,8 @@ falco:
 
   http_output:
     # -- Enable http output for security notifications
-    #DZ: changed form false.
-    enabled: false
+    #DZ: changed to true for falcosidekick.
+    enabled: true
     # -- When set, this will override an auto-generated URL which matches the falcosidekick Service.
     # -- When including Falco inside a parent helm chart, you must set this since the auto-generated URL won't match (#280).
     url: ""
