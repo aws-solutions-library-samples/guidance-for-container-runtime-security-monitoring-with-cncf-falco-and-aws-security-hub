@@ -19,7 +19,7 @@ class AwsSecurityhubFalcoEcsEksIntegrationStack(cdk.Stack):
 
         # create lambda function
         function = _lambda.Function(self, "lambda_function",
-                                    runtime=_lambda.Runtime.PYTHON_3_7,
+                                    runtime=_lambda.Runtime.PYTHON_3_8,
                                     handler="falco-security-hub-int.lambda_handler",
                                     code=_lambda.Code.asset("./lambda"),
                                     role = custom_role)
