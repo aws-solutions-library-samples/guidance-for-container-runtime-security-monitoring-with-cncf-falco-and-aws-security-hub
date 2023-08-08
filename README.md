@@ -24,7 +24,7 @@ steps to activate your virtualenv:
 $ source .venv/bin/activate
 ```
 
-If you are running the samepl on a Windows platform, you would activate the virtualenv like this:
+If you are running the sample on a Windows platform, you would activate the virtualenv like this:
 
 ```
 % .venv\Scripts\activate.bat
@@ -33,7 +33,7 @@ If you are running the samepl on a Windows platform, you would activate the virt
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
-$ pip install -r requirements.txt
+$ python -m pip install -r requirements.txt
 ```
 
 At this point you can now synthesize the CloudFormation template for this code.
@@ -42,11 +42,9 @@ At this point you can now synthesize the CloudFormation template for this code.
 $ cdk synth
 ```
 
-To add additional dependencies, for example other CDK libraries, just add
-them to the `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+To add additional dependencies, for example other CDK libraries, just add them to the `setup.py` file and rerun the `python -m pip install -r requirements.txt` command (or `pip install -r requirements.txt` from pip command prompt).
 
-## Useful commands
+## Useful CDK commands
 
  * `cdk ls`          list all stacks in the app
  * `cdk synth`       emits the synthesized CloudFormation template
