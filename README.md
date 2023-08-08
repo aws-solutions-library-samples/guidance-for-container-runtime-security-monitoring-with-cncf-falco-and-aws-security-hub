@@ -1,4 +1,4 @@
-## Custom integration for Falco security findings from Amazon Elastic Kubernetes Service (Amazon EKS) and Amazon Elastic Container Service (Amazon ECS), into AWS Security Hub
+## Custom integration for Falco security findings from Amazon Elastic Kubernetes Service (Amazon EKS)  into AWS Security Hub
 
 The project deploys a Lambda function, that enables receiving Falco security findings from AWS CloudWatch logs, formatting them in ASFF JSON format and integrating into Security Hub
 
