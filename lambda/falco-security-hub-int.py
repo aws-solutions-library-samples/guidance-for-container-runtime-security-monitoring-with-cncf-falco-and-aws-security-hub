@@ -10,7 +10,7 @@ PARTITION="aws"
 session = boto3.session.Session()
 ec2 = session.resource("ec2")
 sts = session.client('sts')
-ecs = session.client('ecs')
+#ecs = session.client('ecs')
 
 #Get EC2 instance by its ID
 def get_ec2_details(instance_id):
@@ -24,48 +24,6 @@ def get_account_id():
     caller = sts.get_caller_identity()
     return caller.get("Account")
 
-#https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecs.html#ECS.Client.describe_tasks
-def get_ecs_details(ecs_cluster, ecs_task):
-    response = ecs.describe_tasks(cluster=ecs_cluster, tasks=[ecs_task])
-    #get 1st response from 'tasks' and get its details
-    task = response["tasks"][0]
-    az = task["availabilityZone"]
-    created = task["createdAt"]
-    container_resources = []
-    for container in task["containers"]:
-
-        resource = {}
-        resource["Type"] = "Container"
-        resource["Id"] = container["runtimeId"]
-        resource["Details"] = {}
-        resource["Details"]["Container"] = {}
-        resource["Details"]["Other"] = {}
-        resource["Details"]["Other"]["containerArn"] = container["containerArn"]
-        resource["Details"]["Other"]["taskArn"] = container["taskArn"]
-        resource["Details"]["Other"]["containerRuntime"] = container["runtimeId"]
-       
-       
-        resource["Details"]["Container"]["ImageName"] = container["image"]
-        if 'imageDigest' in resource:
-            resource["Details"]["Container"]["ImageId"] = container["imageDigest"]
-        resource["Details"]["Container"]["Name"] = container["name"]
-
-        container_resources.append(resource)
-
-    task_resource = {}
-    task_resource["Id"] = task["taskArn"]
-    task_resource["Type"] = "Other"
-  
-
-    container_resources.append(task_resource)
-
-    cluster_resource = {}
-    cluster_resource["Id"] = ecs_cluster
-    cluster_resource["Type"] = "Other"
-
-    container_resources.append(cluster_resource)
-
-    return container_resources
 
 #https://falco.org/docs/rules/
 def map_finding_severity(priority):
@@ -128,87 +86,6 @@ def create_ec2_instance_resource(instance):
   
     return instance_resource
     
-#Function that converts ECS Falco log entry to ASFF format
-#deprecated since it runs on Docker container engine with a diff syslog format
-def ecs_convert_falco_log_to_asff(entry):
-    
-    
-    region = session.region_name
-    #instance_id = entry["ec2_instance_id"]
-    #instance = get_ec2_details(instance_id)
-    instance_id = None
-    instance = None
-    # Starting try-catch block
-    try: 
-      instance_id = entry["ec2_instance_id"]
-      #print("CHECK: ECS to ASFF got instance_id: ",instance_id)
-      instance = get_ec2_details(instance_id)
-    except:
-      print("PROBLEM: ECS to ASFF looks like there's no element for 'ec2_instance_id'")
-      
-    finally:
-      print("TEST: ECS to ASFF got EC2 instance: ", instance)   
-    # ending try-catch block
-    
-    # parse 'log' element 
-    logEntry = None
-    severity = None
-    
-    try: 
-       # in cases of no exceptions 'log' may not be JSON formatted    
-       logEntry = json.loads(entry["log"]) 
-       severity = map_finding_severity(logEntry["priority"])
-    except:
-       print("PROBLEM: ECS to ASFF looks like there's no 'log' with 'priority' elements inside it - likely no error! ", entry["log"], severity)
-       return None
-    
-    #if no   
-    print ("NB!!! DEBUG: ECS to ASFF parsed log LOG DATA type, contents: ", type(logEntry), logEntry )
-    print ("---------------------------------------------")
-    
-    # get account ID and derived objects
-    account_id= get_account_id()
-    this_id = generate_id(account_id,region)
-    print ("CHECK: ECS to ASFF got account ID, this_id ", account_id, this_id)
-    
-    #check whether instance is null or not
-    if instance is None:
-       print("ECS to ASFF - Could not get instance_resource from NULL instance!") 
-       return None
-    else:
-       instance_resource = create_ec2_instance_resource(instance)     
-    
-    #Obtain ECS resources using ECS c luster and task details
-    ecs_resources = get_ecs_details(entry["ecs_cluster"], entry["ecs_task_arn"])
-    
-    # Initalize and append created instance_resource to an array resources[]
-    resources = []
-    resources.append(instance_resource)
-
-    for container_resource in ecs_resources:
-        resources.append(container_resource)
-
-    #Initialize and start building ASFF finding array
-    finding = {}
-    finding["SchemaVersion"] = "2018-10-08"
-    finding["AwsAccountId"] = account_id
-    finding["Id"] = this_id
-    #DZ; added for AB3
-    finding["CompanyName"] = "AnyCompany"
-    finding["Description"] = str(logEntry["output"])
-    finding["GeneratorId"] = instance_id + "-" + this_id.split("/")[-1]
-    finding["ProductArn"] = f"arn:{PARTITION}:securityhub:{region}:{account_id}:product/{account_id}/default"
-    finding["Severity"] = severity
-    finding["Resources"] = resources
-    finding["Title"] = logEntry["rule"]
-    finding["Types"] = ["Container Software and Configuration Checks"]
-    now = datetime.datetime.now()
-    #Lambda is UTC
-    finding["UpdatedAt"] = f"{now.isoformat(timespec='milliseconds')}Z"
-    finding["CreatedAt"] = f"{now.isoformat(timespec='milliseconds')}Z"
-
-    return finding
-
 
 # Retrieve details of EKS Falco log message entry obtained from 'ouput_fields element'
 
@@ -241,13 +118,11 @@ def get_eks_details(message):
 #        "user.loginuid": -1,
 #        "user.name": "<NA>"
 #    }
-#
-  
+#  
     
     fields = None
     try: 
        #fields = log["output_fields"]
-       #print ("DEBUG: In get_eks_details RAW Data type of message, output_fields: ", type(message), message["output_fields"])
        fields = message["output_fields"]
        print ("DEBUG: get EKS details log 'output_fields' values are: ", fields)
        
@@ -297,9 +172,7 @@ def get_eks_details(message):
     return resources
 
 
-# Convert EKS Falco log message to AWS ASFF format
-# refer examples from here: https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json
-
+# Convert EKS Falco log message to AWS ASFF format for SecurityHub import
 def eks_convert_falco_log_to_asff(entry):
     region = session.region_name
     
@@ -310,9 +183,9 @@ def eks_convert_falco_log_to_asff(entry):
     try: 
       instance_id = entry["ec2_instance_id"]
       instance = get_ec2_details(instance_id)
-      print("DEBUG: EKS to ASFF: got instance_id, instance: ",instance_id,instance)
+      print("EKS to ASFF DEBUG: got instance_id, instance: ",instance_id,instance)
     except:
-      print("PROBLEM: EKS to ASFF: looks like there's no element for 'ec2_instance_id'")
+      print("EKS to ASFF PROBLEM: looks like there's no element for 'ec2_instance_id'")
    
     finally:
       #print("EKS to ASFF got ec2_instance: ", instance)
@@ -348,7 +221,7 @@ def eks_convert_falco_log_to_asff(entry):
       return None
     else:
       instance_resource = create_ec2_instance_resource(instance)
-      print("DEBUG OK: EKS to ASFF got instance_resource: ", instance_resource)
+      print("EKS to ASFF DEBUG: got instance_resource: ", instance_resource)
       
     #eks_resources = get_eks_details(entry)
     #Use parsed JSON object to extract output_fields and more
@@ -358,7 +231,6 @@ def eks_convert_falco_log_to_asff(entry):
     resources = []
     resources.append(instance_resource)
     for container_resource in eks_resources:
-        # print (" ========> DEBUG: adding EKS resource: ", container_resource)
         resources.append(container_resource)
 
     #Start forming ASFF message using known JSON format
@@ -366,7 +238,7 @@ def eks_convert_falco_log_to_asff(entry):
     finding["SchemaVersion"] = "2018-10-08"
     finding["AwsAccountId"] = account_id
     finding["Id"] = this_id
-    #DZ: added for distinction of ASFF recorfds, please change to your Company name
+    #Added for distinction of ASFF records fro demo purposes, please change to your Company name
     finding["CompanyName"] = "AnyCompany"
     finding["Description"] = output
     finding["GeneratorId"] = instance_id + "-" + this_id.split("/")[-1]
@@ -396,16 +268,17 @@ def lambda_handler(event, context):
     
     for entry in data['logEvents']:
         message = json.loads(entry['message'])
-        # DZ: determine which app platform is a source of log message - ECS or EKS - and call corresponding function
-        # unlikely to be used with OCS logs, kept for backward compatibility
+        # DZ: determine which container platform is a source of log message (only EKS is actually sdupported) and call corresponding function
+        # unlikely to be used with ECS source - kept only for backward compatibility
         if "ecs_cluster" in message:
             # Add top level debug print
             print ("-------------------------------------------------------------")
-            print ("LAMBDA FALCO DEBUG: BEFORE calling ECS_convert_falco_log LOG Entry Data type: ", type(message))
+            print ("LAMBDA FALCO WARN: ECS LOG Entry Data type processing is NOT supported: ", type(message))
             print ("-------------------------------------------------------------")
             # end debug print
-            finding = ecs_convert_falco_log_to_asff(message)
-        #DZ: added condition for expected EKS cluster if "ec2_instance_type" field is present in Falco generated logs
+            # finding = ecs_convert_falco_log_to_asff(message)
+            
+        #Added condition for expected EKS cluster source: if "ec2_instance_type" field is present in Falco generated logs
         elif "ec2_instance_type" in message:
             # Add top level debug print
             print ("-------------------------------------------------------------")
@@ -435,9 +308,9 @@ def lambda_handler(event, context):
         sh = session.client('securityhub')
         # import findings to SecurityHUb via API call with Python
         r = sh.batch_import_findings(Findings=findings)
-        print ("LAMBDA FALCO SUCCESS: Imported ASFF findings above into Regional SecurityHub, response: ",r)
+        print ("LAMBDA FALCO - SUCCESS: Imported ASFF findings above into Regional SecurityHub, response: ",r)
     else:
-        print ("LAMBDA FALCO PROBLEM: Could not Import EMPTY SECURITY findings into SecurityHub!")
+        print ("LAMBDA FALCO - PROBLEM: Could not Import EMPTY SECURITY findings into SecurityHub!")
         
     return
 
