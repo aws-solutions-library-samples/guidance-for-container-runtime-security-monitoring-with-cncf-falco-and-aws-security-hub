@@ -4,6 +4,7 @@ import uuid
 import datetime
 import base64
 import gzip
+import logging
 
 PARTITION="aws"
 
