@@ -9,11 +9,14 @@ from aws_cdk import core as cdk
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
-from aws_securityhub_falco_ecs_eks_integration.aws_securityhub_falco_ecs_eks_integration_stack import AwsSecurityhubFalcoEcsEksIntegrationStack
-
+# from aws_securityhub_falco_ecs_eks_integration.aws_securityhub_falco_ecs_eks_integration_stack import AwsSecurityhubFalcoEcsEksIntegrationStack
+# update: use new Python package and function names
+from aws_securityhub_falco_eks_integration.aws_securityhub_falco_eks_integration_stack import AwsSecurityhubFalcoEksIntegrationStack
 
 app = core.App()
-AwsSecurityhubFalcoEcsEksIntegrationStack(app, "AwsSecurityhubFalcoEcsEksIntegrationStack",
+# AwsSecurityhubFalcoEcsEksIntegrationStack(app, "AwsSecurityhubFalcoEcsEksIntegrationStack",
+# removed referenced to ECS
+AwsSecurityhubFalcoEksIntegrationStack(app, "AwsSecurityhubFalcoEksIntegrationStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
