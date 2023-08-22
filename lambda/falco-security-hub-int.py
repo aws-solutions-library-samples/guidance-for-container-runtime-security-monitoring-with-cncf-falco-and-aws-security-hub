@@ -92,7 +92,7 @@ def create_ec2_instance_resource(instance):
 
 def get_eks_details(message):
 
-#DZ: sample log section format
+# sample log section format
 #   "account_id": "133776528597",
 #    "ami_id": "ami-07bccaac087171156",
 #    "az": "us-west-2c",
@@ -125,14 +125,15 @@ def get_eks_details(message):
     try: 
        #fields = log["output_fields"]
        fields = message["output_fields"]
-       print ("DEBUG: get EKS details log 'output_fields' values are: ", fields)
+       logging.debug ("DEBUG: 'get EKS details' log 'output_fields' values are: ", fields)
        
     except:
-       print("PROBLEM: get EKS details - there's no log element for 'output_fields'?!")
+       logging.error("PROBLEM: 'get EKS details' - there's no log element for 'output_fields'?!")
       
     finally:
        #print("CHECK: get_eks_details got output_fields: ", fields)  
-       print("-------------------------------------------------------------------------")
+       # print("-------------------------------------------------------------------------")
+       logging.info("")
     
     #Initialize container metadata to placeholder parameters
     container_id = "test"
@@ -143,7 +144,7 @@ def get_eks_details(message):
     # output = str(logEntry["output"])
     #check if fields elements has values   
     if fields is None:
-       print("!!!CRITICAL PROBLEM in get_eks_details - no data for 'output_fields', cannot retrieve details!!! ")    
+       logging.critical("CRITICAL PROBLEM in get_eks_details - no data for 'output_fields', cannot retrieve details!!! ")    
     else:    
        try:
           container_id = fields["container.id"]
@@ -152,10 +153,10 @@ def get_eks_details(message):
           #container.image.repository
           image = str(fields["container.image.repository"])
        except:
-          print("PROBLEM: get EKS details - looks like there are no EXPECTED 'container' element in 'output_fields' block!")
+          logging.error("PROBLEM: get EKS details - looks like there are no EXPECTED 'container' element in 'output_fields' block!")
        finally:
-          print ("DEBUG: get EKS details obtained Container details: container_id, pod_name, namespace, image: ", container_id, pod_name, namespace, image) 
-          print ("-------------------------------------------------------------------------")
+          logging.debug ("DEBUG: get EKS details obtained Container details: container_id, pod_name, namespace, image: ", container_id, pod_name, namespace, image) 
+          logging.info ("-------------------------------------------------------------------------")
           
     #initialize and start forming resources array
     resources = []
@@ -184,13 +185,13 @@ def eks_convert_falco_log_to_asff(entry):
     try: 
       instance_id = entry["ec2_instance_id"]
       instance = get_ec2_details(instance_id)
-      print("EKS to ASFF DEBUG: got instance_id, instance: ",instance_id,instance)
+      logging.info("EKS to ASFF DEBUG: got instance_id, instance: ",instance_id,instance)
     except:
-      print("EKS to ASFF PROBLEM: looks like there's no element for 'ec2_instance_id'")
+      logging.error("EKS to ASFF PROBLEM: looks like there's no element for 'ec2_instance_id'")
    
     finally:
       #print("EKS to ASFF got ec2_instance: ", instance)
-      print("")
+      logging.info("")
     # ending try-catch block
     
     #get AWDS account ID
@@ -200,29 +201,29 @@ def eks_convert_falco_log_to_asff(entry):
     this_id = generate_id(account_id,region)
     # print ("EKS to ASFF got account ID, this_id ", account_id, this_id)
     
-    # DZ: initialize log Entry 
+    # Initialize log Entry 
     logEntry = None
     try: 
        #output = entry["log"]["output"]
        logEntry = json.loads(entry["log"])
-       # DZ: after getting clean JSON entry try to parse it like it is done in 'cs_convert_falco_log_to_asff' and use it below for fields
-       print (" DEBUG: EKS to ASFF parsed log LOG DATA type, contents: ", type(logEntry), logEntry )
-       print ("---------------------------------------------")
+       # after getting clean JSON entry try to parse it like it is done in 'cs_convert_falco_log_to_asff' and use it below for fields
+       logging.debug (" DEBUG: EKS to ASFF parsed log LOG DATA type, contents: ", type(logEntry), logEntry )
+       logging.info ("-------------------------------------------------------------------------------------")
        output = str(logEntry["output"])
        #severity = map_finding_severity(entry["log"]["priority"])
        severity = map_finding_severity(logEntry["priority"])
        #print("DEBUG: EKS to ASFF got Event output, severity:   ", output, severity)
     except:
-       print("DEBUG: PROBLEM EKS to ASFF there's no 'output' or 'priority' entries in the Log above - cannot convert!")
+       logging.error("PROBLEM EKS to ASFF there's no 'output' or 'priority' entries in the Log above - cannot convert!")
        return None
       
     #check whether instance is null or not
     if instance is None:  
-      #print("PROBLEM: Could not get instance_resource from NULL instance") 
+      logging.error("PROBLEM: Could not get instance_resource from NULL instance") 
       return None
     else:
       instance_resource = create_ec2_instance_resource(instance)
-      print("EKS to ASFF DEBUG: got instance_resource: ", instance_resource)
+      logging.debug("EKS to ASFF: got instance_resource: ", instance_resource)
       
     #eks_resources = get_eks_details(entry)
     #Use parsed JSON object to extract output_fields and more
@@ -264,43 +265,43 @@ def lambda_handler(event, context):
     data = json.loads(gzip.decompress(data_decoded).decode('utf-8'))
     
     findings = []
-    #iterate through data['logEvents'], determine which ones are ECS cluster of EKS cluster related and process Falco logs
-    #to form ASFF formatted security findings
+    #iterate through data['logEvents'], determine which ones are EKS cluster related and process Falco logs
+    #to form ASFF formatted security findings messages
     
     for entry in data['logEvents']:
         message = json.loads(entry['message'])
-        # DZ: determine which container platform is a source of log message (only EKS is actually sdupported) and call corresponding function
+        # Determine which container platform is a source of log message (only EKS is actually sdupported) and call corresponding function
         # unlikely to be used with ECS source - kept only for backward compatibility
         if "ecs_cluster" in message:
-            # Add top level debug print
-            print ("-------------------------------------------------------------")
-            print ("LAMBDA FALCO WARN: ECS LOG Entry Data type processing is NOT supported: ", type(message))
-            print ("-------------------------------------------------------------")
-            # end debug print
+            # Add top level debug logging
+            #logging.debug ("-------------------------------------------------------------")
+            logging.warning ("LAMBDA FALCO WARN: ECS LOG Entry Data type processing is NOT supported: ", type(message))
+            logging.info ("-------------------------------------------------------------")
+            # end debug logging
             # finding = ecs_convert_falco_log_to_asff(message)
             
         #Added condition for expected EKS cluster source: if "ec2_instance_type" field is present in Falco generated logs
         elif "ec2_instance_type" in message:
-            # Add top level debug print
-            print ("-------------------------------------------------------------")
-            print ("LAMBDA FALCO DEBUG: BEFORE calling EKS_convert_falco_log LOG entry Data type: ", type(message))
-            print ("-------------------------------------------------------------")
-            # end debug print
+            # Add top level debug logging
+            #logging.info ("-------------------------------------------------------------")
+            logging.debug ("LAMBDA FALCO DEBUG: BEFORE calling EKS_convert_falco_log LOG entry Data type: ", type(message))
+            logging.info ("-------------------------------------------------------------")
+            # end debug logging
             finding = eks_convert_falco_log_to_asff(message)
         else:
             finding = None
-            print ("LAMBDA FALCO PROBLEM:  Unknown CW Log event message type detected (not ECS, EKS) - DONT KNOW HOW TO PROCESS!!!")
+            logging.warning ("LAMBDA FALCO event handler: Unknown CW Log event message source detected - cannot determine security finding!")
 
         #after getting security findings, append it to an array
-        #print ("RESULT: AFTER calling XXXX_convert_falco_log_to_asff ASFF finding is: ", finding)
-        print ("-------------------------------------------------------------")
+        logging.debug ("LAMBDA FALCO DEBUG: AFTER calling XXXX_convert_falco_log_to_asff ASFF finding is: ", finding)
+        #logging.info ("-------------------------------------------------------------")
         
-        #DZ: ignore 'empy' findings that may not be actual errors
+        #ignore 'empty' findings that may not be actual errors
         if finding is None:
-           print("LAMBDA FALCO DEBUG: PROBLEM Cannot append EMPTY finding to 'findings' for SecurityHub")    
+           logging.warning("LAMBDA FALCO: PROBLEM Cannot append EMPTY finding to 'findings' for SecurityHub")    
         else:    
            findings.append(finding)
-           #print("LAMBDA FALCO DEBUG: OK Appended ASFF to findings: ", finding)
+           logging.debug("LAMBDA FALCO: Sucessfully Appended ASFF data to findings: ", finding)
     #end for loop
     
     #batch import ASFF formatted findings into SecurityHub
@@ -309,13 +310,13 @@ def lambda_handler(event, context):
         sh = session.client('securityhub')
         # import findings to SecurityHUb via API call with Python
         r = sh.batch_import_findings(Findings=findings)
-        print ("LAMBDA FALCO - SUCCESS: Imported ASFF findings above into Regional SecurityHub, response: ",r)
+        logging.info ("LAMBDA FALCO - SUCCESS: Imported ASFF findings above into Regional SecurityHub, response: ",r)
     else:
-        print ("LAMBDA FALCO - PROBLEM: Could not Import EMPTY SECURITY findings into SecurityHub!")
+        logging.warning ("LAMBDA FALCO - PROBLEM: Could not Import EMPTY SECURITY findings into SecurityHub!")
         
     return
 
-#DZ OPTIONAL new function to parse out in "log" field JSON substring to remove esscaped '\"'
+# OPTIONAL new function to parse out in "log" field JSON substring to remove esscaped '\"'
 def parseJSON(source): 
 
    #"log": "2023-02-02T00:43:56.734263328Z stdout F {\"hostname\":\"falco-z95gm\",\"output\":\"21:17:02.642052704: Error File below /etc opened for writing 
@@ -324,7 +325,7 @@ def parseJSON(source):
    # res = source[idx1: idx2+2] # idx2+1 b/c we need the 2nd closing }}
    res = source.replace('\"','"')
    # printing result
-   print("DEBUG: parseJSON - The extracted CLEAN LOG JSON Data type, values are: ", type(res), res)
-   print ("--------------------------------------------")
+   logging.warning("DEBUG: parseJSON - The extracted CLEAN LOG JSON Data type, values are: ", type(res), res)
+   logging.info ("--------------------------------------------------------------------------")
 
    return res

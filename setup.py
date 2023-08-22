@@ -16,11 +16,15 @@ setuptools.setup(
 
     author="author",
 
-    package_dir={"": "aws_securityhub_falco_ecs_eks_integration"},
-    packages=setuptools.find_packages(where="aws_securityhub_falco_ecs_eks_integration"),
+    #package_dir={"": "aws_securityhub_falco_ecs_eks_integration"},
+    #packages=setuptools.find_packages(where="aws_securityhub_falco_ecs_eks_integration"),
+    
+    #updated source code directory structure 
+    package_dir={"": "aws_securityhub_falco_eks_integration"},
+    packages=setuptools.find_packages(where="aws_securityhub_falco_eks_integration"),
 
     install_requires=[
-        #DZ: updated CDK version
+        # Updated CDK version
         "aws-cdk.core==1.185.0",
     ],
 
