@@ -21,4 +21,3 @@ condition: evt.type = execve and evt.dir=< and container.id != host and proc.nam
 output: "locate command run in container (user=%user.name %container.info parent=%proc.pname cmdline=%proc.cmdline)"
 priority: NOTICE
 warn_evttypes: False
-
