@@ -44,6 +44,68 @@ cdk synth
 
 To add additional dependencies, for example other CDK libraries, just add them to the `setup.py` file and rerun the `python -m pip install -r requirements.txt` command (or `pip install -r requirements.txt` from pip command prompt).
 
+You may need to bootstrap your Account/region to cdk using command like:
+```
+cdk bootstrap aws://<account ID>/<us-west-2>
+......
+[WARNING] @aws-cdk/aws-lambda.Code#asset is deprecated.
+  use `fromAsset`
+  This API will be removed in the next major release.
+ ⏳  Bootstrapping environment aws://<account ID>/us-west-2...
+Trusted accounts for deployment: (none)
+Trusted accounts for lookup: (none)
+Using default execution policy of 'arn:aws:iam::aws:policy/AdministratorAccess'. Pass '--cloudformation-execution-policies' to customize.
+CDKToolkit: creating CloudFormation changeset...
+ ✅  Environment aws://<account ID>/us-west-2 bootstrapped.
+```
+Then initialize deployment of artifacts into target Account/Region environment:
+
+```
+cdk deploy
+...
+[WARNING] @aws-cdk/aws-lambda.Code#asset is deprecated.
+  use `fromAsset`
+  This API will be removed in the next major release.
+
+✨  Synthesis time: 1.03s
+
+This deployment will make potentially sensitive changes according to your current security approval level (--require-approval broadening).
+Please confirm you intend to make the following modifications:
+
+IAM Statement Changes
+┌───┬───────────────────┬────────┬─────────────────────────────────┬──────────────────────────────┬───────────┐
+│   │ Resource          │ Effect │ Action                          │ Principal                    │ Condition │
+├───┼───────────────────┼────────┼─────────────────────────────────┼──────────────────────────────┼───────────┤
+│ + │ ${CustomRole.Arn} │ Allow  │ sts:AssumeRole                  │ Service:lambda.amazonaws.com │           │
+├───┼───────────────────┼────────┼─────────────────────────────────┼──────────────────────────────┼───────────┤
+│ + │ *                 │ Allow  │ ec2:DescribeInstances           │ AWS:${CustomRole}            │           │
+│ + │ *                 │ Allow  │ ecs:DescribeTasks               │ AWS:${CustomRole}            │           │
+│ + │ *                 │ Allow  │ securityhub:BatchImportFindings │ AWS:${CustomRole}            │           │
+└───┴───────────────────┴────────┴─────────────────────────────────┴──────────────────────────────┴───────────┘
+IAM Policy Changes
+┌───┬───────────────┬────────────────────────────────────────────────────────────────────────────────┐
+│   │ Resource      │ Managed Policy ARN                                                             │
+├───┼───────────────┼────────────────────────────────────────────────────────────────────────────────┤
+│ + │ ${CustomRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole │
+└───┴───────────────┴────────────────────────────────────────────────────────────────────────────────┘
+(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+
+Do you wish to deploy these changes (y/n)? y
+AwsSecurityhubFalcoEksIntegrationStack: deploying... [1/1]
+[0%] start: Building and publishing 23af06be3d08822fbfabb7584213fde595fd9086a8cce59bf34f1eaa43bd30ae:current
+[100%] success: Built and published 23af06be3d08822fbfabb7584213fde595fd9086a8cce59bf34f1eaa43bd30ae:current
+AwsSecurityhubFalcoEksIntegrationStack: creating CloudFormation changeset...
+
+ ✅  AwsSecurityhubFalcoEksIntegrationStack
+
+✨  Deployment time: 54.51s
+
+Stack ARN:
+arn:aws:cloudformation:us-west-2:133776528597:stack/AwsSecurityhubFalcoEksIntegrationStack/0630f0c0-961e-11ee-8bf5-06e93086ece7
+✨  Total time: 55.54s
+```
+The message above should confirm successful deployment of AwsSecurityhubFalcoEksIntegrationStack components
+
 ## Useful CDK commands
 
  * `cdk ls`          list all stacks in the app
