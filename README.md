@@ -19,18 +19,23 @@
 
 This section provides an architecture diagram and describes the components deployed with this Guidance.
 
-![](static/falco_eks_integration_architecture_updated.png)
+![](falco_eks_integration_architecture_updated.png)
+
+*Figure 1. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)*
 
 ### Architecture steps
 
-1. Users interact with Extraction, Transformation and Loading (ETL) development and orchestration tools via [Amazon CloudFront](https://aws.amazon.com/cloudfront/) endpoints with [Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/) origins, which provide secure connections between clients and ETL tools’ endpoints.
-2. Users interactively develop, test and schedule ETL jobs that process batch and stream data. The data traffic between ETL processes and data stores flows through [Amazon Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/) Endpoints ([AWS PrivateLink](https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html)) without leaving the AWS network.
-3. [JupyterHub](https://jupyter.org/hub), [Argo Workflows](https://argoproj.github.io/workflows/) and [Kubernetes Operator for Apache Spark](https://github.com/kubeflow/spark-operator/tree/master) are running as containers on [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster. JupyterHub IDE can integrate with a source code repository (GitHub) to track ETL assets changes made by users. The assets include JupyterHub notebook files, SQL scripts etc., to be run with the [Arc ETL framework](https://arc.tripl.ai/).
-4. ETL assets can be updated by users in the source code repository (GitHub), then uploaded to an [Amazon S3](https://aws.amazon.com/s3/) bucket. The synchronization process can be implemented by an automated [CI/CD](https://about.gitlab.com/topics/ci-cd/) deployment process triggered by updates in the source code repository or performed manually.
-5. Users can change Docker build source code uploaded from a code repository to the S3 ETL Asset bucket. It activates an [AWS CodeBuild](https://aws.amazon.com/codebuild/) /[AWS CodePipeline](https://aws.amazon.com/codepipeline) CI/CD pipeline to automatically rebuild and push the [Arc ETL Framework container image](https://github.com/tripl-ai/docker) to [Amazon ECR](https://aws.amazon.com/ecr) private registry. 
-6. Users schedule ETL jobs via Argo Workflows to be run on [Amazon EKS](https://aws.amazon.com/eks/) cluster. These jobs automatically pull Arc ETL Framework container image from ECR, download ETL assets from the artifact S3 bucket, and send application execution logs to [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/). Access to all the AWS services is secured via VPC endpoints.
-7. JupyterHub IDE automatically retrieves login credentials from [Amazon Secrets Manager](https://aws.amazon.com/secrets-manager/) to validate sign-in user requests. Authenticated users can interactively develop and test their notebooks as ETL jobs in JupyterHub.
-8. Users can access the ETL output data stored in the S3 bucket that supports the transactional Data lake format and query the [Delta Lake](https://docs.aws.amazon.com/athena/latest/ug/delta-lake-tables.htm) tables through [Amazon Athena](https://aws-preview.aka.amazon.com/athena/) integrated with [AWS Glue Data Catalog](https://docs.aws.amazon.com/prescriptive-guidance/latest/serverless-etl-aws-glue/aws-glue-data-catalog.html).
+1. FluentBit /[AWS FireLens](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html) log event aggregation and [Cloud Native Computing Foundations (CNCF) Falco](https://www.cncf.io/projects/falco/) security monitoring components are deployed into [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks) Clusters, running in same or different regions
+2. CNCF Falco components monitor application containers running on EKS cluster nodes for possible security incidents (based on defined rules) at run time and  generate security events
+3. Security events are streamed to FluentBit/AWS FireLens log event aggregators
+4. Aggregated security events are imported into [AWS Cloud Watch](https://aws.amazon.com/cloudwatch/) log streams, specified log groups 
+5. AWS Lambda functions get triggered by security events in CloudWatch log stream, detect and transform them into [Amazon Security Findings Format (ASFF)](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html) schema and import into regional [Amazon Security Hub](https://aws.amazon.com/security-hub/) instances
+6. Security findings in ASFF format are available in regional Security Hub portals for acknowledgement and triage by regional teams.
+7. "Regional" Security findings aggregated  into ”single pane of glass” central Security Hub portal that includes regional SecurityHub as members (can be one of the regional Hub instances) 
+8. Security team users authenticate into the ”single pane of glass” central SecurityHub portal via [Amazon Identity and Access Management (IAM)](https://aws.amazon.com/iam/) , access is granted according to their IAM Roles
+9. Aggregated security findings are available in the ”single pane of glass” central SecurityHub portal for acknowledgement and triage using workflows. 
+
+
 
 ### AWS Services used  in this Guidance
 
@@ -39,16 +44,10 @@ This section provides an architecture diagram and describes the components deplo
 |[Amazon Elastic Kubernetes Service - EKS](https://aws.amazon.com/eks/)|Core service - The EKS service is used to host the guidance workloads|
 |[Amazon Virtual Private Cloud - VPC](https://aws.amazon.com/vpc/)| Core Service - network security layer |
 |[Amazon Elastic Compute Cloud - EC2](https://aws.amazon.com/ec2/)| Core Service - EC2 instance power On Demand and Spot based EKS compute node groups for running container workloads|
-|[Amazon Elastic Container Registry - ECR](https://aws.amazon.com/ecr/)|Core service - ECR registry is used to host the container images for Spark jobs and Arc ETL Framework|
-|[Amazon Elastic Map Reduce EMR on EKS](https://aws.amazon.com/emr/features/eks/)| Auxiliary service - alternative way to configure and run ETL Jobs on EKS| 
-|[Amazon Athena](https://aws.amazon.com/athena/)| Core service - used for SQL syntax Querying of Sample ETL job results from S3|
-|[AWS Glue Data Catalog](https://docs.aws.amazon.com/glue/latest/dg/components-overview.html#data-catalog-intro)| Auxiliary service - exposes ETL related data stores |
-|[Amazon S3](https://aws.amazon.com/s3/)|Core service - Object storage for users' ETL assets from GitHub|
-|[Amazon CloudFront](https://aws.amazon.com/cloudfront/)|Auxiliary service - provides SSL entrypoints for Jupyter and Argo Workflows tools |
-|[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)|Auxiliary service - provides observability for core services  |
-|[AWS Secretes Manager](https://aws.amazon.com/secrets-manager/)|Auxiliary service - provides user credentials management for Jupyter IDE |
-|[AWS CodeBuild](https://aws.amazon.com/codebuild/)| Core service - CI/CD automation for building Arc ETL framework images  |
-|[AWS CodePipeline](https://aws.amazon.com/codepipeline)| Core service - CI/CD automation for pushing Arc ETL framework images into ECR registry|
+|[Amazon Elastic Container Registry - ECR](https://aws.amazon.com/ecr/)|Core service - ECR registry is used to host application container images|
+|[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)|Core service - stores Falco generated log events  |
+|[Amazon Identity and Access Manager - IAM](https://aws.amazon.com/iam/))|Auxiliary service - provides user credentials and role mgmt  |
+
 
 ## Plan your deployment
 
@@ -73,9 +72,8 @@ for one month.
 | VPC Endpoint | \$0.01 per hour per VPC endpoint per Availability Zone (AZ) X 5 endpoints (Amazon S3, Amazon Athena, Amazon ECR, AWS KMS, and Amazon CloudWatch) X 2 AZs | \$73.00 |
 | VPC Endpoint | \$0.01 per GB data processed per month X 10 GB | \$0.1 |
 | Amazon S3 (storage) |  \$0.023 per GB for First 50 TB/month X 1 GB | \$0.02 |
-| AWS CodeBuild | \$0.005 per build minute on general1.small X 150 minutes per month | \$0.75 |
-| AWS CodePipeline | \$1.00 per active pipeline per month X 1 | \$1.00 |
-|**Total estimated cost per month:**| | **\$467.76** |
+
+|**Total estimated cost per month:**| | **\$XXX.YY** |
 
 Amazon CloudFront cost is not included in the estimation table, as its monthly [Free Tier](https://aws.amazon.com/cloudfront/pricing/) can fully covered the usage. To avoid the instance capacity issue, additional types of r5.xlarge and 5a.xlarge are included in the EC2 Spot Instance fleet, and r6g.xlarge,r6gd.xlarge are included in the Graviton Spot instance fleet. Their pricing varies based on the time period your instances are running. For more information on Spot Instances pricing, refer to the [Amazon EC2 Spot Instances Pricing page](https://aws.amazon.com/ec2/spot/pricing)
 
