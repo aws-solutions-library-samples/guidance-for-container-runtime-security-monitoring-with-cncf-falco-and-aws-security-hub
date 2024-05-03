@@ -1,4 +1,16 @@
-## Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS) with CNCF Falco and AWS Security Hub
+## Table of Content
+1. [Overview](#overview)
+    - [Cost](#cost)
+2. [Prerequisites](#prerequisites)
+    - [Operating System](#operating-system)
+3. [Deployment Steps](#deployment)
+4. [Deployment Validation](#deployment-validation)
+5. [Running the Guidance](#running-the-guidance)
+6. [Cleanup](#cleanup)
+
+## Overview
+
+Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS) with CNCF Falco and AWS Security Hub
 
 ### Features and benefits
 
@@ -35,8 +47,6 @@ This section provides an architecture diagram and describes the components deplo
 8. Security team users authenticate into the ”single pane of glass” central SecurityHub portal via [Amazon Identity and Access Management (IAM)](https://aws.amazon.com/iam/) , access is granted according to their IAM Roles
 9. Aggregated security findings are available in the ”single pane of glass” central SecurityHub portal for acknowledgement and triage using workflows. 
 
-
-
 ### AWS Services used  in this Guidance
 
 | **AWS service**  | Description |
@@ -49,7 +59,7 @@ This section provides an architecture diagram and describes the components deplo
 |[Amazon Identity and Access Manager - IAM](https://aws.amazon.com/iam/))|Auxiliary service - provides user credentials and role mgmt  |
 
 
-## Plan your deployment
+## Prerequisites
 
 ### Cost 
 
@@ -76,6 +86,10 @@ for one month.
 |**Total estimated cost per month:**| | **\$XXX.YY** |
 
 Amazon CloudFront cost is not included in the estimation table, as its monthly [Free Tier](https://aws.amazon.com/cloudfront/pricing/) can fully covered the usage. To avoid the instance capacity issue, additional types of r5.xlarge and 5a.xlarge are included in the EC2 Spot Instance fleet, and r6g.xlarge,r6gd.xlarge are included in the Graviton Spot instance fleet. Their pricing varies based on the time period your instances are running. For more information on Spot Instances pricing, refer to the [Amazon EC2 Spot Instances Pricing page](https://aws.amazon.com/ec2/spot/pricing)
+
+### Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
 ## Deployment
 
@@ -193,10 +207,9 @@ The message above should confirm successful deployment of AwsSecurityhubFalcoEks
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
+## Cleanup 
+ In order to unstall the guidance, perform the following commands
+ 
 ## License
 
 This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
