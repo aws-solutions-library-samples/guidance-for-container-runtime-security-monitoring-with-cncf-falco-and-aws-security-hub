@@ -51,13 +51,12 @@ This section provides an architecture diagram and describes the components deplo
 
 | **AWS service**  | Description |
 |-----------|------------|
-|[Amazon Elastic Kubernetes Service - EKS](https://aws.amazon.com/eks/)|Core service - The EKS service is used to host the guidance workloads|
-|[Amazon Virtual Private Cloud - VPC](https://aws.amazon.com/vpc/)| Core Service - network security layer |
+|[Amazon Elastic Kubernetes Service - EKS](https://aws.amazon.com/eks/)|Core service -  EKS service is used to run the secured container workloads|
+|[Amazon Virtual Private Cloud - VPC](https://aws.amazon.com/vpc/)| Core Service - Network security layer |
 |[Amazon Elastic Compute Cloud - EC2](https://aws.amazon.com/ec2/)| Core Service - EC2 instance power On Demand and Spot based EKS compute node groups for running container workloads|
 |[Amazon Elastic Container Registry - ECR](https://aws.amazon.com/ecr/)|Core service - ECR registry is used to host application container images|
 |[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)|Core service - stores Falco generated log events  |
 |[Amazon Identity and Access Manager - IAM](https://aws.amazon.com/iam/))|Auxiliary service - provides user credentials and role mgmt  |
-
 
 ## Prerequisites
 
@@ -82,7 +81,6 @@ for one month.
 | VPC Endpoint | \$0.01 per hour per VPC endpoint per Availability Zone (AZ) X 5 endpoints (Amazon S3, Amazon Athena, Amazon ECR, AWS KMS, and Amazon CloudWatch) X 2 AZs | \$73.00 |
 | VPC Endpoint | \$0.01 per GB data processed per month X 10 GB | \$0.1 |
 | Amazon S3 (storage) |  \$0.023 per GB for First 50 TB/month X 1 GB | \$0.02 |
-
 |**Total estimated cost per month:**| | **\$XXX.YY** |
 
 Amazon CloudFront cost is not included in the estimation table, as its monthly [Free Tier](https://aws.amazon.com/cloudfront/pricing/) can fully covered the usage. To avoid the instance capacity issue, additional types of r5.xlarge and 5a.xlarge are included in the EC2 Spot Instance fleet, and r6g.xlarge,r6gd.xlarge are included in the Graviton Spot instance fleet. Their pricing varies based on the time period your instances are running. For more information on Spot Instances pricing, refer to the [Amazon EC2 Spot Instances Pricing page](https://aws.amazon.com/ec2/spot/pricing)
