@@ -392,8 +392,7 @@ This creates a policy called *EKS-CloudWatchLogs* with privileges to
 send logs to Amazon CloudWatch.
 
 ```bash
-aws iam attach-role-policy --role-name <EKS-NODE-ROLE-NAME> --policy-arn \`aws iam list-policies | jq -r '.\[\]\[\] |
-select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
+aws iam attach-role-policy --role-name <EKS-NODE-ROLE-NAME> --policy-arn `aws iam list-policies | jq -r '.[][] | select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'`
 ```
   
 NOTE: “EKS-NODE-ROLE-NAME” is the role that is attached to the EKS compute nodes. You can find the role attached by checking any of EC2
@@ -412,14 +411,10 @@ select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
 ```
 #### Set up Fluentbit/Amazon FireLens Log Aggregation on EKS Cluster
 
-To preview and update, if necessary, the configuration of
-Fluentbit/FireLens components, navigate to the Fluentbit/Kubernetes
-directory and review the configuration files
-(Fluentbit-config-crio.yaml, daemonset.yaml and service-account.yaml)
-that will be applied.
+To preview and update, if necessary, the configuration of Fluentbit/FireLens components, navigate to the `fluent-bit/kubernetes`
+directory and review the configuration files (fluentbit-config-crio.yaml, daemonset.yaml and service-account.yaml) that will be applied.
 
-NOTE: you can specify the target AWS region, CloudWatch log group and
-log stream names by adjusting the following parameters in the file:
+NOTE: you can specify the target AWS region, CloudWatch log group and log stream names by adjusting the following parameters in the file:
 [Fluentbit-config-crio.yaml](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/fluent-bit/kubernetes/fluent-bit-config-crio.yaml)
 ```yaml
 …
@@ -439,7 +434,7 @@ To apply Fluentbit/FireLens configuration, run the following command
 from the guidance root directory:
 
 ```bash
-# first, create a namespace for Falco related components if it doesn’t exist yet
+# first, create a namespace for Falco related components if it doesn’t exist yet kubectl create ns falco
 kubectl create ns falco
 
 # Deploy Fluentbit - FireLens integration
@@ -455,13 +450,11 @@ serviceaccount/Fluentbit created
 clusterrole.rbac.authorization.k8s.io/pod-log-reader created
 clusterrolebinding.rbac.authorization.k8s.io/pod-log-crb created
 ```
+That completes installation/configuration of FireLens/FluentBit integration
 
 #### Falco Helm Template Configuration Update and Installation
 
-Clone
-the [falcosecurity/falco](https://github.com/falcosecurity/charts) Helm
-chart repository as below and add the Helm chart to the list of known
-repositories.
+Clone the [falcosecurity/falco](https://github.com/falcosecurity/charts) public Helm chart repository as below and add the Helm chart to the list of known repositories.
 
 ```bash
 git clone https://github.com/falcosecurity/charts.git;
@@ -483,8 +476,7 @@ aspect of adopting this highly configurable solution.
 
 json_output: true
 
-# -- When using json output, whether or not to include the "output"
-property
+# -- When using json output, whether or not to include the "output" property
 # itself (e.g. "File below a known binary directory opened for writing
 # (user=root ....") in the json output.
 
@@ -500,14 +492,11 @@ json_include_tags_property: true
 ```
 
 Please refer to the sample of
-[values.yaml ](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml)with
-customizations above is included into sample code repository for your
-reference.
+[values.yaml ](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml) with customizations above is included into sample code repository for your reference.
 
-Please note where Falco rules configuration files will be deployed in
-pods, also specified as parameters in the
-[values.yaml](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml)
-file above:
+Please note where Falco rules configuration files will be deployed in pods, also specified as parameters in the
+[values.yaml](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml) file above:
+
 ```bash
 ..
 
@@ -526,10 +515,9 @@ rules_file:
 …
 ```
 
-After performing that (and other optional customizations, e.g., enabling Falcosidekick - outside of this Guidance scope) install the Helm chart
-running the following command:
+After performing that (and other optional customizations, e.g., enabling Falcosidekick - outside of this Guidance scope) install the Helm chart running the following command:
 ```bash
-helm install falco -f &lt;path-to&gt;/values.yaml falcosecurity/falco -n falco
+helm install falco -f <path-to-/values.yaml> falcosecurity/falco -n falco
 ```
 You should see an output similar to the following:
 ```bash
@@ -552,7 +540,7 @@ Falco agents are spinning up on each node in your cluster. After a few seconds, 
 security or suspicious events behavior (configured in Falco rules) an sending the log events to FireLens, which transforms the JSON logs as
 per the configuration settings specified and finally sends the logs to CloudWatch.
 
-At the end, you should have the following number of pods and deployments.
+At the end, you should have the following pods and deployments related to Falco:
 ```bash
 kubectl -n falco get pods
 ```
@@ -585,15 +573,12 @@ falco-falcosidekick-ui-redis-0 1/1 Running 0 85s
 
 As you can see, both Fluentbit/FireLens and Falco pods are up and running in the specified EKS namespace
 
-(Optional) To check that settings specified in *values.yaml* file are
-correctly set in the Falco pods, you can connect to one of the pods
-(total number should be equal to number of EKS nodes) using the
-following command:
+(Optional) To check that settings specified in *values.yaml* file are correctly set in the Falco pods, you can connect to one of the pods
+(total number should be equal to number of EKS nodes) using the following command:
 ```bash
 kubectl -n falco exec -it <falco-pod-name> -- /bin/bash
 ```
-Once inside Falco pod, navigate to its deployment directory `/etc/falco` and verify that `falco.yaml` file has `json_output settings` as specified
-above:
+Once inside Falco pod, navigate to its deployment directory `/etc/falco` and verify that `falco.yaml` file has `json_output settings` as specified above:
 ```bash
 # ls /etc/falco
 falco.yaml falco_rules.yaml
@@ -617,11 +602,9 @@ CloudWatch Logs group is the trigger for running the Lambda function in AWS acco
 
 To deploy the sample code into your AWS account:
 
-1.  Follow the instructions above to build and deploy AWS Integration components via AWS CDK. Make sure that you deploy the solution to the region(s)
-    hosting your Amazon EKS clusters.
+1.  Follow the instructions above to build and deploy AWS Integration components via AWS CDK. Make sure that you deploy the solution to the region(s) hosting your Amazon EKS clusters.
 
-2.  Navigate to the [AWS Lambda Console ](https://console.aws.amazon.com/lambda)and confirm that
-    you see the newly created Lambda function. You will use this function in the next section.
+2.  Navigate to the [AWS Lambda Console ](https://console.aws.amazon.com/lambda)and confirm that you see the newly created Lambda function. You will use this function in the next section.
 
 <!--img src="media/image4.png" style="width:7.5in;height:0.34861in" /
 
