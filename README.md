@@ -31,19 +31,19 @@ Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)
 
 This section provides an architecture diagram and describes the components deployed with this Guidance.
 
-![](falco_eks_integration_architecture_updated.png)
+![](images/falco_eks_integration_architecture_updated.png)
 
 *Figure 1. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)*
 
 ### Architecture steps
 
 1. FluentBit /[AWS FireLens](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html) log event aggregation and [Cloud Native Computing Foundations (CNCF) Falco](https://www.cncf.io/projects/falco/) security monitoring components are deployed into [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks) Clusters, running in same or different regions
-2. CNCF Falco components monitor application containers running on EKS cluster nodes for possible security incidents (based on defined rules) at run time and  generate security events
-3. Security events are streamed to FluentBit/AWS FireLens log event aggregators
+2. CNCF Falco components monitor application containers running on EKS cluster nodes for possible security incidents (based on defined rules) at run time and  generate security events.
+3. Security events are streamed to FluentBit/AWS FireLens log event aggregators running on EKS as well.
 4. Aggregated security events are imported into [AWS Cloud Watch](https://aws.amazon.com/cloudwatch/) log streams, specified log groups 
-5. AWS Lambda functions get triggered by security events in CloudWatch log stream, detect and transform them into [Amazon Security Findings Format (ASFF)](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html) schema and import into regional [Amazon Security Hub](https://aws.amazon.com/security-hub/) instances
+5. AWS Lambda function get triggered by security events in CloudWatch log stream, detect and transform security event data into [Amazon Security Findings Format (ASFF)](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html) schema and import into regional [Amazon Security Hub](https://aws.amazon.com/security-hub/) instances
 6. Security findings in ASFF format are available in regional Security Hub portals for acknowledgement and triage by regional teams.
-7. "Regional" Security findings aggregated  into ”single pane of glass” central Security Hub portal that includes regional SecurityHub as members (can be one of the regional Hub instances) 
+7. Regional Security findings aggregated  into ”single pane of glass” central Security Hub portal that includes regional SecurityHub as members (can be one of the regional Hub instances) 
 8. Security team users authenticate into the ”single pane of glass” central SecurityHub portal via [Amazon Identity and Access Management (IAM)](https://aws.amazon.com/iam/) , access is granted according to their IAM Roles
 9. Aggregated security findings are available in the ”single pane of glass” central SecurityHub portal for acknowledgement and triage using workflows. 
 
@@ -74,16 +74,13 @@ for one month.
 |-----------|------------|------------|
 | Amazon EKS cluster (no compute) |  \$0.10 per hour per cluster X 1 | \$73.00 |
 | Amazon EC2 (On-Demand) | \$0.1632 per hour X 1 m7g.xlarge instance | \$119.14|
-| Amazon EC2 (Spot) | \$0.1174 per hour X 1 r4.xlarge instance | \$85.70 |
-| Amazon EC2 (Graviton Spot) | \$0.0966 per hour X 1 r7g.xlarge instance | \$70.52 | 
 | Elastic Load Balancing | \$0.0225 Application Load Balancer per hour X 2 ALBs | \$32.85 |
 | Elastic Load Balancing | \$0.008 Load Balancer Capacity Units (LCU) per hour X 2 ALBs | \$11.68 |
 | VPC Endpoint | \$0.01 per hour per VPC endpoint per Availability Zone (AZ) X 5 endpoints (Amazon S3, Amazon Athena, Amazon ECR, AWS KMS, and Amazon CloudWatch) X 2 AZs | \$73.00 |
 | VPC Endpoint | \$0.01 per GB data processed per month X 10 GB | \$0.1 |
-| Amazon S3 (storage) |  \$0.023 per GB for First 50 TB/month X 1 GB | \$0.02 |
 |**Total estimated cost per month:**| | **\$XXX.YY** |
 
-Amazon CloudFront cost is not included in the estimation table, as its monthly [Free Tier](https://aws.amazon.com/cloudfront/pricing/) can fully covered the usage. To avoid the instance capacity issue, additional types of r5.xlarge and 5a.xlarge are included in the EC2 Spot Instance fleet, and r6g.xlarge,r6gd.xlarge are included in the Graviton Spot instance fleet. Their pricing varies based on the time period your instances are running. For more information on Spot Instances pricing, refer to the [Amazon EC2 Spot Instances Pricing page](https://aws.amazon.com/ec2/spot/pricing)
+ For more information on Spot Instances pricing, refer to the [Amazon EC2 Spot Instances Pricing page](https://aws.amazon.com/ec2/spot/pricing)
 
 ### Security
 
@@ -135,9 +132,9 @@ cdk synth
 
 To add additional dependencies, for example other CDK libraries, just add them to the `setup.py` file and rerun the `python -m pip install -r requirements.txt` command (or `pip install -r requirements.txt` from pip command prompt).
 
-You may need to bootstrap your Account/region to cdk using command like:
+You may need to bootstrap your Account/region to CDK using command like:
 ```bash
-cdk bootstrap aws://<account ID/<us-west-2
+cdk bootstrap aws://<account ID/s-west-2
 ......
 [WARNING] @aws-cdk/aws-lambda.Code#asset is deprecated.
   use `fromAsset`
@@ -211,7 +208,7 @@ The message above should confirm successful deployment of AwsSecurityhubFalcoEks
 ## License
 
 This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
-## BELOW IS COPY FROM THE WORD CPNVERTED IMPLEMENTATION GUIDE
+## BELOW IS COPY FROM THE WORD CONVERTED IMPLEMENTATION GUIDE
 
 [1](#guidance-for-container-run-time-security-monitoring-on-amazon-eks-with-cncf-falco-and-amazon-securityhub)](#guidance-for-container-run-time-security-monitoring-on-amazon-eks-with-cncf-falco-and-amazon-securityhub)
 
@@ -258,28 +255,28 @@ Hub](#review-security-findings-from-all-regions-in-the-aggregated-security-hub)
 
 Customers want a single and comprehensive view of the security postureof their workloads. Runtime security event monitoring is important to
 running secure, operationally excellent, and reliable workloads,especially in environments that run containers and container
-orchestration platforms. In this guidance, we show you how to useservices such as [<uAWS Security
-Hub</u](https://aws.amazon.com/security-hub/) and [<uFalco</u](https://falco.org/),a [<uCloud Native Computing Foundation</u](https://www.cncf.io/) project, to build a continuouscontainer runtime security monitoring solution.
+orchestration platforms. In this guidance, we show you how to useservices such as [AWS Security
+Hub](https://aws.amazon.com/security-hub/) and [Falco](https://falco.org/),a [Cloud Native Computing Foundation](https://www.cncf.io/) project, to build a continuous container runtime security monitoring solution.
 
 With this solution in place, you can collect runtime security findingsfrom multiple AWS regions running one or more containerized workloads on
-AWS container orchestration platforms, such as [<uAmazon ElasticKubernetes Service (Amazon EKS)</u](https://aws.amazon.com/eks/) . The solution collates container run-time security findings across thoseregions into a designated account where you can have a unified view ofSecurity posture across regions and container workloads.
+AWS container orchestration platforms, such as [Amazon ElasticKubernetes Service (Amazon EKS)](https://aws.amazon.com/eks/) . The solution collates container run-time security findings across thoseregions into a designated account where you can have a unified view ofSecurity posture across regions and container workloads.
 
 ### Solution overview
 
-Amazon Security Hub collects security findings from other AWS services using a standardized [<uAWS Security Findings Format
-(ASFF)</u](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html). Falco provides
-the ability to detect security events at runtime forcontainers. [<uPartner
-integrations</u](https://aws.amazon.com/security-hub/partners/) likeFalco are also available on Security Hub and use ASFF. Security Hub
+Amazon Security Hub collects security findings from other AWS services using a standardized [AWS Security Findings Format
+(ASFF)](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html). Falco provides
+the ability to detect security events at runtime forcontainers. [Partner
+integrations](https://aws.amazon.com/security-hub/partners/) likeFalco are also available on Security Hub and use ASFF. Security Hub
 provides a custom integrations feature using ASFF to enable collectionand aggregation of findings that are generated by custom security
 products.
 
-The solution in this guidance uses [<uAWS FireLens</u](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html), [<uAmazon
-CloudWatch Logs</u](http://aws.amazon.com/cloudwatch), and [<uAWSLambda</u](http://aws.amazon.com/lambda) to enrich logs from Falco and
+The solution in this guidance uses [AWS FireLens](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html), [Amazon
+CloudWatch Logs](http://aws.amazon.com/cloudwatch), and [AWSLambda](http://aws.amazon.com/lambda) to enrich logs from Falco and
 populate Security Hub.
 
-<img src="media/image2.svg" style="width:4.91111in;height:4.48567in" /
-
-Figure 1: Architecture diagram of CNCF Falco continuous runtime securitymonitoring components in Kubernetes cluster
+<!-- <img src="media/image2.svg" style="width:4.91111in;height:4.48567in" / -->
+![](images/Falco_component_archictecture.png) <br/>
+Figure 2: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster
 
 Falco provides streaming detection of unexpected behavior, configuration
 changes, and attacks.
@@ -306,81 +303,55 @@ Guidance web page*):
 1.  An AWS account is used for running container workloads in Amazon EKS
     on Region 1.
 
-    1.  Runtime security events detected by Falco for that workload are
-        sent to CloudWatch logs using AWS FireLens/Fluentbit
-        integration.
+    -  Runtime security events detected by Falco for that workload are sent to CloudWatch logs using AWS FireLens/Fluentbit integration.
 
-    2.  CloudWatch logs act as the source for FireLens and a trigger for
-        the Lambda function in the next step.
+    -  CloudWatch logs act as the source for FireLens and a trigger for the Lambda function in the next step.
 
-    3.  The Lambda function transforms the logs into the ASFF. These
-        findings can now be imported into Security Hub.
+    -  The Lambda function transforms the logs into the ASFF. Thes findings can now be imported into Security Hub.
 
-    4.  The Security Hub instance that is running in the same region as
-        the workload running on Amazon EKS ingests and processes the
-        findings provided by Lambda to present security posture to users
-        of the account. This instance also acts as a member account for
-        Security Hub.
+    -  The Security Hub instance that is running in the same region as the workload running on Amazon EKS ingests and processes the
+        findings provided by Lambda to present security posture to users of the account. This instance also acts as a member account for Security Hub.
 
-2.  An AWS account (same by default, using different is also possible
-    with additional Security Hub configuration) is used for running
+2.  An AWS account (same by default, using different is also possible with additional Security Hub configuration) is used for running
     container workloads on Amazon EKS on Region 2.
 
-    1.  Runtime security events detected by Falco for that workload are
-        sent to CloudWatch logs using AWS FireLens/Fluentbit
+    -  Runtime security events detected by Falco for that workload are sent to CloudWatch logs using AWS FireLens/Fluentbit
         integration.
 
-    2.  CloudWatch logs acts as the source for FireLens and a trigger
-        for the Lambda function in the next step.
+    -  CloudWatch logs acts as the source for FireLens and a trigger for the Lambda function in the next step.
 
-    3.  The Lambda function transforms the logs into the ASFF. These
-        findings can now be imported into Security Hub.
+    -  The Lambda function transforms the logs into the ASFF. These findings can now be imported into Security Hub.
 
-    4.  The Security Hub instance that is running in the same region as
-        the workload running on Amazon EKS ingests and processes the
-        findings provided by Lambda and provides the security posture to
-        users of the account. This instance also acts as another member
-        account for Security Hub.
+    -  The Security Hub instance that is running in the same region as the workload running on Amazon EKS ingests and processes the findings provided by Lambda and provides the security posture to users of the account. This instance also acts as another member account for Security Hub.
 
-3.  If your workloads span multiple regions, Security Hub
-    supports [<uaggregating findings across Regions</u](https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation.html).
+3.  If your workloads span multiple regions, Security Hub supports [aggregating findings across Regions](https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation.html).
 
 The designated Security Hub administrator account (can be the same as one of existing Security instances) combines security findings from member AWS regions/accounts, and provides a comprehensive view of security alerts and security posture across regions/accounts. 
 
 ### Prerequisites
 
-For this walkthrough, you should have the following in place:
+For successful deployment, you should have the following in place:
 
 1.  AWS accounts.
 
  Note: You can use different AWS accounts so you can validate Security Hub’s support for a multi-account setup. However, for a simpler
  configuration, you can use a single AWS account instead to deploy the Amazon EKS workloads in different regions, and send findings to
  regional instances of Security Hubs in the same account. If you are integrated with AWS Organizations, the designated Security Hub
- administrator account [<uwill automatically have access to the member accounts</u](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-accounts.html).
+ administrator account [will automatically have access to the member accounts](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-accounts.html).
 
-1.  Amazon EKS cluster(s) deployed in AWS region
+2.  Amazon EKS cluster(s) deployed in AWS region
 
- **NOTE NB! Below is the Note for Technical Publishing team in *italics* – need to decide how to reference Related Content from Implementation Guide**
+ **NOTE: Below is the Note for Technical Publishing team in *italics* – need to decide how to reference Related Content from Implementation Guide**
 
- *If you do not have an EKS cluster, you can provision one using one of EKS cluster deployment Terraform blueprints from the EKS blueprints
- repository mentioned in the “**Related Content**”*
+3. Security Hub instance set up with an Administrator account in AWS region.
 
- *Related Content section should show “Amazon EKS” “Sample Code” and link to the EKS Terraform Blueprint for tenancy with teams:
- <https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/main/examples/multi-tenancy-with-teams*
+4. Security Hub instances set up in multiple regions to ingest and  rocess security events from Amazon EKS clusters with workloads. For instructions on how to automatically deploy Amazon EKS cluster with  arious add-ons please see Example and Documentation in the “Related Content” (see above **NOTE** )
 
-1.  Security Hub instance set up with an Administrator account in AWS region.
-
-2.  Security Hub instances set up in multiple regions to ingest and  rocess security events from Amazon EKS clusters with workloads. For
-    instructions on how to automatically deploy Amazon EKS cluster with  arious add-ons please see Example and Documentation in the “Related
-    Content” (see above **NOTE** )
-
-3.  CNCF Falco set up on the Amazon EKS clusters, with logs routed to CloudWatch Logs using FireLens. For instructions on deployment,
+5.  CNCF Falco set up on the Amazon EKS clusters, with logs routed to CloudWatch Logs using FireLens. For instructions on deployment,
     please see [below](#deployment-walkthrough):
 
-4.  AWS Cloud Development Kit (CDK) CLI
- [<uinstalled</u](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) on
-    the member accounts to deploy the solution that provides the custom
- integration between Falco and Security Hub.
+6.  AWS Cloud Development Kit (CDK) CLI [installed](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) on
+    the member accounts to deploy the solution that provides the custom integration between Falco and Security Hub.
 
  
 
@@ -401,17 +372,15 @@ this Guidance.
     finally sent to AWS CloudWatch as the final destination.
 
 
+### Clone the project repository
 
-### #Clone the Falco repository
+Git clone this repository to your deployment environment: 
+```bash
+git clone https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub
+```
+Navigate to directory `eks/Fluentbit` - you will find two directorie called `aws` and `kubernetes`
 
-Git clone this repository to your local
-machine: <https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub
-
-Navigate to directory eks/Fluentbit and you will find two directories
-called `aws` and `kubernetes`
-
-`aws` – this is the directory that has the IAM policy
-called iam\_role\_policy.json, which you will attach to the compute node
+`aws` – this is the directory that has the IAM policy called iam_role_policy.json, which you will attach to the compute node
 IAM role which is automatically attached to the compute nodes when
 deploy an EKS cluster. This policy will give Falco running on the EKS
 compute nodes ability to send/stream logs to Amazon CloudWatch.
@@ -425,21 +394,20 @@ by one using kubectl apply command
 
 #### Set up IAM Permissions for Falco
 
-aws iam create-policy --policy-name EKS-CloudWatchLogs --policy-document
-file://./Fluentbit/aws/iam\_role\_policy.json
-
+Run the following command in order to create an IAM policy 
+```bash
+aws iam create-policy --policy-name EKS-CloudWatchLogs --policy-document file://./Fluentbit/aws/iam_role_policy.json
+```
 This creates a policy called *EKS-CloudWatchLogs* with privileges to
 send logs to Amazon CloudWatch.
+
 ```bash
-aws iam attach-role-policy --role-name &lt;EKS-NODE-ROLE-NAME&gt;
---policy-arn \`aws iam list-policies | jq -r '.\[\]\[\] |
+aws iam attach-role-policy --role-name <EKS-NODE-ROLE-NAME> --policy-arn \`aws iam list-policies | jq -r '.\[\]\[\] |
 select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
 ```
-<u  
-NOTE:</u “EKS-NODE-ROLE-NAME” is the role that is attached to the EKS
-compute nodes. You can find the role attached by checking any of EC2
-node instances. For example, in the example
-below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
+  
+NOTE: “EKS-NODE-ROLE-NAME” is the role that is attached to the EKS compute nodes. You can find the role attached by checking any of EC2
+node instances. For example, in the example below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
 
 <img src="media/image3.png" style="width:7.5in;height:3.00694in" /
 
@@ -474,11 +442,11 @@ Match falco.\*\*
 
 region us-west-2
 
-log\_group\_name falco
+log_group_name falco
 
-log\_stream\_name alerts-eks
+log_stream_name alerts-eks
 
-auto\_create\_group true
+auto_create_group true
 
 …
 ```
@@ -513,7 +481,7 @@ clusterrolebinding.rbac.authorization.k8s.io/pod-log-crb created
 #### Falco Helm Template Configuration Update and Installation
 
 Clone
-the [<ufalcosecurity/falco</u](https://github.com/falcosecurity/charts) Helm
+the [falcosecurity/falco](https://github.com/falcosecurity/charts) Helm
 chart repository as below and add the Helm chart to the list of known
 repositories.
 
@@ -522,9 +490,9 @@ git clone https://github.com/falcosecurity/charts.git;
 helm repo add falcosecurity https://falcosecurity.github.io/charts
 ```
 
-Falco behavior can be controlled by a [<uconfiguration parameters</u](https://github.com/falcosecurity/charts/tree/master/falco#introduction),
+Falco behavior can be controlled by a [configuration parameters](https://github.com/falcosecurity/charts/tree/master/falco#introduction),
 which can be supplied as runtime parameters while installing the chart or by creating a special purpose file, for example **values.yaml** (you
-can give any name). Please reference this [<upage</u](https://github.com/falcosecurity/charts/tree/master/falco#introduction) to
+can give any name). Please reference this [page](https://github.com/falcosecurity/charts/tree/master/falco#introduction) to
 understand all Falco chart configuration parameters, which control the run time behavior of Falco audit level, log level, output formats etc.
 
 NOTE: The jsonOutput property is false in the Falco chart parameter file `values.yaml` by default. Set to true for JSON formatted output via
@@ -535,14 +503,14 @@ aspect of adopting this highly configurable solution.
 # loading/validation results as json, which allows for easier
 # consumption by downstream programs. Default is "false".
 
-json\_output: true
+json_output: true
 
 # -- When using json output, whether or not to include the "output"
 property
 # itself (e.g. "File below a known binary directory opened for writing
 # (user=root ....") in the json output.
 
-json\_include\_output\_property: true
+json_include_output_property: true
 
 # -- When using json output, whether or not to include the "tags" property
 
@@ -550,7 +518,7 @@ json\_include\_output\_property: true
 # with no tags will have a "tags" field set to an empty array. If set to
 # false, the "tags" field will not be included in the json output at all.
 
-json\_include\_tags\_property: true
+json_include_tags_property: true
 ```
 
 Please refer to the sample of
@@ -569,13 +537,13 @@ file above:
 # you have overrides they appear in later files.
 # -- The location of the rules files that will be consumed by Falco.
 
-rules\_file:
+rules_file:
 
-\- /etc/falco/falco\_rules.yaml
+- /etc/falco/falco_rules.yaml
 
-\- /etc/falco/falco\_rules.local.yaml
+- /etc/falco/falco_rules.local.yaml
 
-\- /etc/falco/rules.d
+- /etc/falco/rules.d
 
 …
 ```
@@ -646,20 +614,20 @@ following command:
 ```bash
 kubectl -n falco exec -it &lt;falco-pod-name&gt; -- /bin/bash
 ```
-Once inside Falco pod, navigate to its deployment directory `/etc/falco` and verify that `falco.yaml` file has `json\_output settings` as specified
+Once inside Falco pod, navigate to its deployment directory `/etc/falco` and verify that `falco.yaml` file has `json_output settings` as specified
 above:
 ```bash
 # ls /etc/falco
-falco.yaml falco\_rules.yaml
+falco.yaml falco_rules.yaml
 # cat /etc/falco/falco.yaml | grep json
 
-json\_include\_output\_property: true
+json_include_output_property: true
 
-json\_include\_tags\_property: true
+json_include_tags_property: true
 
-json\_output: true
+json_output: true
 
-library\_path: libjson.so
+library_path: libjson.so
 
 name: json
 ```
@@ -674,7 +642,7 @@ To deploy the sample code into your AWS account:
 1.  Follow the instructions above to build and deploy AWS Integration components via AWS CDK. Make sure that you deploy the solution to the region(s)
     hosting your Amazon EKS clusters.
 
-2.  Navigate to the [<uAWS Lambda Console </u](https://console.aws.amazon.com/lambda)and confirm that
+2.  Navigate to the [AWS Lambda Console ](https://console.aws.amazon.com/lambda)and confirm that
     you see the newly created Lambda function. You will use this function in the next section.
 
 <img src="media/image4.png" style="width:7.5in;height:0.34861in" /
@@ -695,7 +663,7 @@ Enable Trigger from the CloudWatch Logs group
         logs’.
 
     -   Log group – Choose the Log group you noted in Step 4 of
-        the [<uPrerequisites</u](#prerequisites). In our setup, the
+        the [Prerequisites](#prerequisites). In our setup, the
         log group for Amazon EKS clusters, deployed in separate AWS
         accounts, was set with the same value (falco).
 
@@ -719,8 +687,8 @@ Enable Trigger from the CloudWatch Logs group
 
 Now that you’ve deployed the solution, you will verify that it’s working.
 
-With the [<udefault
-rules</u](https://github.com/falcosecurity/rules/blob/3ceea88eeb6710e2c3d2726805a4ff0e93862de9/rules/falco_rules.yaml),
+With the [default
+rules](https://github.com/falcosecurity/rules/blob/3ceea88eeb6710e2c3d2726805a4ff0e93862de9/rules/falco_rules.yaml),
 Falco generates alerts for “suspicious” activities such as:
 
 -   An attempt to write to a file below the /etc folder in a container.
@@ -737,10 +705,10 @@ the same account. Then you will review the findings.
 
 1.  Run the following commands to simulate hacker attack which should
     trigger an alert in AWS Region 1, which is running an Amazon EKS
-    cluster. Replace *&lt;pod\_name&gt; *with your own value for test
+    cluster. Replace *&lt;pod_name&gt; *with your own value for test
     pod name
 ```bash
-kubectl -n &lt;namespace&gt; exec -it &lt;pod\_name&gt; -- /bin/bash
+kubectl -n &lt;namespace&gt; exec -it &lt;pod_name&gt; -- /bin/bash
 
 touch /etc/1
 
@@ -753,7 +721,7 @@ cat /etc/shadow &gt; /dev/null
 
 1.  (Optional) To see the log generated by Falco security event pushed
     to CloudWatch via Amazon Fluentbit/FireLens integration, you can
-    take a look in the ‘*falco’* Log Group, ‘*alerts\_eks’* folder
+    take a look in the ‘*falco’* Log Group, ‘*alerts_eks’* folder
     contents and review Log entries generated after simulation of
     container hacking:
 
@@ -796,8 +764,8 @@ cat /etc/shadow &gt; /dev/null
 
  In the screenshot below, you can see the Resources details of above
  finding, that includes the instance ID of the Amazon EKS cluster node.
- In our example, this is the [<uAmazon Elastic Compute Cloud (Amazon
- EC2)</u](http://aws.amazon.com/ec2) instance.
+ In our example, this is the [Amazon Elastic Compute Cloud (Amazon
+ EC2)](http://aws.amazon.com/ec2) instance.
 
  <img src="media/image11.png" style="width:5.52659in;height:3.87431in" /
 
@@ -809,10 +777,10 @@ cat /etc/shadow &gt; /dev/null
     1](#test-deployment-in-aws-region-1), authenticate to EKS cluster
     deployed in Region 2 and run the following commands to simulate
     hacker attack which should trigger an alert in Region 2, which is
-    running an Amazon EKS cluster. Replace *&lt;pod\_name&gt; *with your
+    running an Amazon EKS cluster. Replace *&lt;pod_name&gt; *with your
     own value for a test pod
 ```bash
-kubectl -n &lt;namespace&gt; exec -it &lt;pod\_name&gt; -- /bin/bash
+kubectl -n &lt;namespace&gt; exec -it &lt;pod_name&gt; -- /bin/bash
 
 touch /etc/4
 
@@ -903,12 +871,12 @@ cat /etc/shadow &gt; /dev/null
 To clean up this demo:
 
 1.  Delete the CloudWatch Logs trigger from the Lambda functions that
-    were created in the section [<uEnable the CloudWatch Logs
-    group</u](#deploy-integration-with-securityhub).
+    were created in the section [Enable the CloudWatch Logs
+    group](#deploy-integration-with-securityhub).
 
 2.  Delete the Lambda functions by deleting the CloudFormation stack,
-    created in the section [<uDeploy Integration with
-    SecurityHub</u](#deploy-integration-with-securityhub).
+    created in the section [Deploy Integration with
+    SecurityHub](#deploy-integration-with-securityhub).
 
 3.  Uninstall Falco security components by running the following
     commands to verify and delete Helm chart release:
@@ -928,7 +896,7 @@ helm delete **falco** -n falco
 ```
 1.  (Optional, only if no longer needed for other workloads) Delete
     Amazon EKS cluster(s) created as part of
-    the [<uPrerequisites</u](#prerequisites).
+    the [Prerequisites](#prerequisites).
 
  
 
@@ -941,8 +909,8 @@ Service and support is provided best-effort by** AWS Solution Architects
 and the user community.
 
 To post feedback, submit feature ideas or report bugs, you can use
-the [<uIssues
-section</u](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/issues) of
+the [Issues
+section](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/issues) of
 the sample GitHub repository.
 
 If you are interested in contributing to the guidance sample code, you
@@ -951,36 +919,23 @@ guide.](https://github.com/aws-solutions-library-samples/guidance-for-container-
 
 ### Troubleshooting
 
-For troubleshooting AWS components of the Guidance (FireLens/Fluentbit,
-CloudWatch, Lambda, SecurityHub) please collect operational support
-information from the problematic component (CloudWatch and Lambda log
-files, various metrics and logs from EKS clusters etc.) and review them
+For troubleshooting AWS components of the Guidance (FireLens/Fluentbit, CloudWatch, Lambda, SecurityHub) please collect operational support
+information from the problematic component (CloudWatch and Lambda log files, various metrics and logs from EKS clusters etc.) and review them
 for error messages, then contact AWS Support if needed.
 
-Lambda security log event transformation and import function Python code
-has been verified for Runtime 3.8 running on x86\_64 architecture:
+Lambda security log event transformation and import function Python code has been verified for Runtime 3.8 running on x86_64 architecture:
 
 <img src="media/image17.png" style="width:7.5in;height:1.49236in" /
 
 Figure 12: Lambda function runtime settings in AWS Console
 
-Setting up “Update runtime version” to Auto should ensure that when
-Python runtime environment gets deprecated, it would be automatically
+Setting up “Update runtime version” to Auto should ensure that when Python runtime environment gets deprecated, it would be automatically
 updated for this function which should keep it working.
 
-Since CNCF Falco is an Open Source project, for troubleshooting Falco
-components for please follow the project repository for
-[issues](https://github.com/falcosecurity/falco/issues) as well as this
-Kubernetes Slack channel:
-<https://kubernetes.slack.com/archives/CMWH3EH32
+Since CNCF Falco is an Open Source project, for troubleshooting Falco components for please follow the project repository for
+[issues](https://github.com/falcosecurity/falco/issues) as well as this Kubernetes Slack [channel](https://kubernetes.slack.com/archives/CMWH3EH32)
 
-## 
 
-## 
-
-## 
-
-## 
 
 ## Conclusion
 
@@ -1000,11 +955,11 @@ You can extend this solution in a number of ways. For example:
     findings generated, using Lambda.
 
 To learn more about managing a centralized Security Hub administrator
-account, see [<uManaging administrator and member
-accounts</u](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-accounts.html).
-To learn more about working with ASFF, see [<uAWS Security Finding
+account, see [Managing administrator and member
+accounts](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-accounts.html).
+To learn more about working with ASFF, see [AWS Security Finding
 Format
-(ASFF)</u](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html) in
+(ASFF)](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html) in
 the documentation. To learn more about the Falco engine and rule
-structure, see the [<uFalco
-documentation</u](https://falco.org/docs/getting-started/falco-kubernetes-quickstart/).
+structure, see the [Falco
+documentation](https://falco.org/docs/getting-started/falco-kubernetes-quickstart/).
