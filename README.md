@@ -66,8 +66,7 @@ You are responsible for the cost of the AWS services used while running this Gui
 
 ### Sample Cost table
 
-The following table provides a sample cost breakdown for deploying this
-Guidance with the default parameters in the US East (N. Virginia) Region
+The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region
 for one month.
 
 | **AWS service**  | Rate | Cost \[USD\] |
@@ -92,12 +91,7 @@ The project deploys a Lambda function, that enables receiving Falco security fin
 
 The `cdk.json` file instructs the CDK Toolkit how to execute your application. It was updated for CDK 2.0 per document: https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html.
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+This project is set up like a standard Python project.  The initialization process also creates a virtualenv within this project, stored under the `.venv` directory.  To create the virtualenv it assumes that there is a `python3` (or `python` for Windows) executable in your path with access to the `venv` package. If for any reason the automatic creation of the virtualenv fails, you can create the virtualenv manually.
 
 To manually create a virtualenv on MacOS and Linux:
 
@@ -253,7 +247,7 @@ Hub](#review-security-findings-from-all-regions-in-the-aggregated-security-hub)
 
 ### Introduction
 
-Customers want a single and comprehensive view of the security postureof their workloads. Runtime security event monitoring is important to
+Customers want a single and comprehensive view of the security posture of their cloud native workloads. Runtime security event monitoring is important to
 running secure, operationally excellent, and reliable workloads,especially in environments that run containers and container
 orchestration platforms. In this guidance, we show you how to useservices such as [AWS Security
 Hub](https://aws.amazon.com/security-hub/) and [Falco](https://falco.org/),a [Cloud Native Computing Foundation](https://www.cncf.io/) project, to build a continuous container runtime security monitoring solution.
@@ -347,7 +341,7 @@ For successful deployment, you should have the following in place:
 
 4. Security Hub instances set up in multiple regions to ingest and  rocess security events from Amazon EKS clusters with workloads. For instructions on how to automatically deploy Amazon EKS cluster with  arious add-ons please see Example and Documentation in the “Related Content” (see above **NOTE** )
 
-5.  CNCF Falco set up on the Amazon EKS clusters, with logs routed to CloudWatch Logs using FireLens. For instructions on deployment,
+5.  CNCF Falco set up on the Amazon EKS clusters, with logs routing to CloudWatch Logs using FireLens. For instructions on deployment,
     please see [below](#deployment-walkthrough):
 
 6.  AWS Cloud Development Kit (CDK) CLI [installed](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) on
@@ -378,19 +372,15 @@ Git clone this repository to your deployment environment: 
 ```bash
 git clone https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub
 ```
-Navigate to directory `eks/Fluentbit` - you will find two directorie called `aws` and `kubernetes`
+Navigate to directory `fluent-bit` - you will find two directorie called `aws` and `kubernetes`
 
 `aws` – this is the directory that has the IAM policy called iam_role_policy.json, which you will attach to the compute node
-IAM role which is automatically attached to the compute nodes when
-deploy an EKS cluster. This policy will give Falco running on the EKS
+IAM role which is automatically attached to the compute nodes when deploy an EKS cluster. This policy will give Falco running on the EKS
 compute nodes ability to send/stream logs to Amazon CloudWatch.
 
-`kubernetes` – this directory has three files: configmap.yaml,
-daemonset.yaml, and service-account.yaml. These files will be applied to
-create a ConfigMap for Fluent Bit configuration, DaemonSet to run pods
-on all compute nodes, and finally a Service Account for the RBAC cluster
-role for authorization. All the files can be applied all at once or one
-by one using kubectl apply command
+`kubernetes` – this directory has three files: configmap.yaml, daemonset.yaml, and service-account.yaml. These files will be applied to
+create a ConfigMap for Fluent Bit configuration, DaemonSet to run pods on all compute nodes, and finally a Service Account for the RBAC cluster
+role for authorization. All the files can be applied all at once or one by one using `kubectl apply` command
 
 #### Set up IAM Permissions for Falco
 
@@ -409,15 +399,16 @@ select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
 NOTE: “EKS-NODE-ROLE-NAME” is the role that is attached to the EKS compute nodes. You can find the role attached by checking any of EC2
 node instances. For example, in the example below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
 
-<img src="media/image3.png" style="width:7.5in;height:3.00694in" /
+<!-- img src="media/image3.png" style="width:7.5in;height:3.00694in" / -->
+![](images/Falco_component_archictecture.png) <br/>
+Figure 2: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster
 
-Figure 1. IAM Role attached to EC2 instance of EKS Compute node
+Figure 3. IAM Role attached to EC2 instance of EKS Compute node
 
 Below is an example of the command to attach needed policies to EKS node
 role above:
 ```bash
-aws iam attach-role-policy --role-name eks-cluster-1-managed-ondemand
---policy-arn \`aws iam list-policies | jq -r '.\[\]\[\] |
+aws iam attach-role-policy --role-name eks-cluster-1-managed-ondemand --policy-arn \`aws iam list-policies | jq -r '.\[\]\[\] |
 select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
 ```
 #### Set up Fluentbit/Amazon FireLens Log Aggregation on EKS Cluster
@@ -429,7 +420,7 @@ directory and review the configuration files
 that will be applied.
 
 NOTE: you can specify the target AWS region, CloudWatch log group and
-log stream names by adjusting the following parameters in the
+log stream names by adjusting the following parameters in the file:
 [Fluentbit-config-crio.yaml](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/fluent-bit/kubernetes/fluent-bit-config-crio.yaml)
 ```yaml
 …
@@ -612,7 +603,7 @@ correctly set in the Falco pods, you can connect to one of the pods
 (total number should be equal to number of EKS nodes) using the
 following command:
 ```bash
-kubectl -n falco exec -it &lt;falco-pod-name&gt; -- /bin/bash
+kubectl -n falco exec -it <falco-pod-name> -- /bin/bash
 ```
 Once inside Falco pod, navigate to its deployment directory `/etc/falco` and verify that `falco.yaml` file has `json_output settings` as specified
 above:
@@ -645,15 +636,15 @@ To deploy the sample code into your AWS account:
 2.  Navigate to the [AWS Lambda Console ](https://console.aws.amazon.com/lambda)and confirm that
     you see the newly created Lambda function. You will use this function in the next section.
 
-<img src="media/image4.png" style="width:7.5in;height:0.34861in" /
+<!--img src="media/image4.png" style="width:7.5in;height:0.34861in" /
 
-*Figure 2: Imported Lambda function for Falco events integration with
+*Figure 3: Imported Lambda function for Falco events integration with
 Security Hub*
 
 Enable Trigger from the CloudWatch Logs group
 
 1.  In the AWS Management Console, select the Lambda function shown in
-    Figure 2—AwsSecurityhubFalcoEcsEksln-lambdafunction—and then, on
+    Figure 3—AwsSecurityhubFalcoEcsEksln-lambdafunction—and then, on
     the Function overview screen, select *+ Add trigger*.
 
 2.  On the ‘Add trigger’ screen, provide the following information and
