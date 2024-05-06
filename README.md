@@ -386,7 +386,7 @@ role for authorization. All the files can be applied all at once or one by one u
 
 Run the following command in order to create an IAM policy 
 ```bash
-aws iam create-policy --policy-name EKS-CloudWatchLogs --policy-document file://./Fluentbit/aws/iam_role_policy.json
+aws iam create-policy --policy-name EKS-CloudWatchLogs --policy-document file://./fluent-bit/aws/iam_role_policy.json
 ```
 This creates a policy called *EKS-CloudWatchLogs* with privileges to
 send logs to Amazon CloudWatch.
@@ -400,8 +400,7 @@ NOTE: “EKS-NODE-ROLE-NAME” is the role that is attached to the EKS compute 
 node instances. For example, in the example below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
 
 <!-- img src="media/image3.png" style="width:7.5in;height:3.00694in" / -->
-![](images/Falco_component_archictecture.png) <br/>
-Figure 2: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster
+![](images/eks_iam_role.png) <br/>
 
 Figure 3. IAM Role attached to EC2 instance of EKS Compute node
 
@@ -425,47 +424,35 @@ log stream names by adjusting the following parameters in the file:
 ```yaml
 …
 
-\[OUTPUT\]
+[OUTPUT]
 
 Name cloudwatch
-
 Match falco.\*\*
-
 region us-west-2
-
 log_group_name falco
-
 log_stream_name alerts-eks
-
 auto_create_group true
-
 …
 ```
 
 To apply Fluentbit/FireLens configuration, run the following command
 from the guidance root directory:
+
 ```bash
-# first, create a namespace for Falco related components if it doesn’t
-exist yet
+# first, create a namespace for Falco related components if it doesn’t exist yet
 kubectl create ns falco
 
-\# Deploy Fluentbit - FireLens integration
-kubectl apply -f Fluentbit/kubernetes/ -n falco
+# Deploy Fluentbit - FireLens integration
+kubectl apply -f fluent-bit/kubernetes/ -n falco
 ```
 
-It should generate an output like shown below confirming that all K8s
-objects are created in the target namespace:
+It should generate an output like shown below confirming that all K8s objects are created in the target namespace:
 ```bash
 configmap/Fluentbit-config created
-
 daemonset.apps/fluentbit created
-
 configmap/Fluentbit-config configured
-
 serviceaccount/Fluentbit created
-
 clusterrole.rbac.authorization.k8s.io/pod-log-reader created
-
 clusterrolebinding.rbac.authorization.k8s.io/pod-log-crb created
 ```
 
