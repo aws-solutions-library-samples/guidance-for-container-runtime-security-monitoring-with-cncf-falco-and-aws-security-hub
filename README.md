@@ -459,6 +459,7 @@ Clone the [falcosecurity/falco](https://github.com/falcosecurity/charts) publi
 ```bash
 git clone https://github.com/falcosecurity/charts.git;
 helm repo add falcosecurity https://falcosecurity.github.io/charts
+helm repo update
 ```
 
 Falco behavior can be controlled by a [configuration parameters](https://github.com/falcosecurity/charts/tree/master/falco#introduction),
@@ -467,19 +468,16 @@ can give any name). Please reference this [page](https://github.com/falcosecuri
 understand all Falco chart configuration parameters, which control the run time behavior of Falco audit level, log level, output formats etc.
 
 NOTE: The jsonOutput property is false in the Falco chart parameter file `values.yaml` by default. Set to true for JSON formatted output via
-Fluentbit as well as related properties. This guidance is not covering customization of Falco audit rules, which is a whole different important
-aspect of adopting this highly configurable solution.
+Fluentbit as well as related properties. This guidance is not covering customization of Falco audit rules, which is a whole different important aspect of adopting this highly configurable solution.
 ```bash
 # -- If "true", print falco alert messages and rules file
 # loading/validation results as json, which allows for easier
 # consumption by downstream programs. Default is "false".
-
 json_output: true
 
 # -- When using json output, whether or not to include the "output" property
 # itself (e.g. "File below a known binary directory opened for writing
 # (user=root ....") in the json output.
-
 json_include_output_property: true
 
 # -- When using json output, whether or not to include the "tags" property
@@ -487,7 +485,6 @@ json_include_output_property: true
 # itself in the json output. If set to true, outputs caused by rules
 # with no tags will have a "tags" field set to an empty array. If set to
 # false, the "tags" field will not be included in the json output at all.
-
 json_include_tags_property: true
 ```
 
@@ -507,17 +504,17 @@ Please note where Falco rules configuration files will be deployed in pods, also
 rules_file:
 
 - /etc/falco/falco_rules.yaml
-
 - /etc/falco/falco_rules.local.yaml
-
 - /etc/falco/rules.d
-
 …
 ```
 
 After performing that (and other optional customizations, e.g., enabling Falcosidekick - outside of this Guidance scope) install the Helm chart running the following command:
 ```bash
 helm install falco -f <path-to-/values.yaml> falcosecurity/falco -n falco
+
+#for example if cloned Falco Helm chart repository is in `./charts/charts/falco` location:
+helm install falco -f ./charts/charts/falco/values.yaml falcosecurity/falco -n falco 
 ```
 You should see an output similar to the following:
 ```bash
@@ -536,7 +533,9 @@ NOTES:
 Falco agents are spinning up on each node in your cluster. After a few seconds, they are going to start monitoring your containers looking for security issues.
 ```
 
-**NOTE: No further action should be required.** Once this deployment is completed, Falco will be monitoring your Kubernetes cluster pods for
+**NOTE: No further action should be required.** 
+
+Once this deployment is completed, Falco will be monitoring your Kubernetes cluster pods for
 security or suspicious events behavior (configured in Falco rules) an sending the log events to FireLens, which transforms the JSON logs as
 per the configuration settings specified and finally sends the logs to CloudWatch.
 
@@ -547,31 +546,16 @@ kubectl -n falco get pods
 You should see the following output:
 ```bash
 NAME READY STATUS RESTARTS AGE
-
-**falco-22xt9 2/2 Running 0 85s**
-
-**falco-9jnlf 2/2 Running 0 85s**
-
-falco-falcosidekick-6f9cc9bc44-clqsn 1/1 Running 0 85s
-
-falco-falcosidekick-6f9cc9bc44-mzzll 1/1 Running 0 85s
-
-falco-falcosidekick-ui-5854bc5d66-cqcgv 1/1 Running 3 (64s ago) 85s
-
-falco-falcosidekick-ui-5854bc5d66-m7r9g 1/1 Running 3 (63s ago) 85s
-
-falco-falcosidekick-ui-redis-0 1/1 Running 0 85s
-
-**falco-k9cdk 2/2 Running 0 85s**
-
-**fluentbit-4rmkf 1/1 Running 0 6d23h**
-
-**fluentbit-7gfwz 1/1 Running 0 6d23h**
-
-**fluentbit-fv2fw 1/1 Running 0 6d23h**
+NAME              READY   STATUS    RESTARTS   AGE
+falco-7lvsz       2/2     Running   0          3m1s
+falco-pvnkk       2/2     Running   0          3m1s
+falco-vdvc8       2/2     Running   0          3m1s
+fluentbit-f9hft   1/1     Running   0          16m
+fluentbit-hdrj4   1/1     Running   0          16m
+fluentbit-wqtv9   1/1     Running   0          16m
 ```
 
-As you can see, both Fluentbit/FireLens and Falco pods are up and running in the specified EKS namespace
+As you can see, both Fluentbit/FireLens and Falco pods are up and running in the specified EKS namespace `falco`
 
 (Optional) To check that settings specified in *values.yaml* file are correctly set in the Falco pods, you can connect to one of the pods
 (total number should be equal to number of EKS nodes) using the following command:
@@ -585,13 +569,9 @@ falco.yaml falco_rules.yaml
 # cat /etc/falco/falco.yaml | grep json
 
 json_include_output_property: true
-
 json_include_tags_property: true
-
 json_output: true
-
 library_path: libjson.so
-
 name: json
 ```
 
@@ -620,16 +600,12 @@ Enable Trigger from the CloudWatch Logs group
 2.  On the ‘Add trigger’ screen, provide the following information and
     then select Add, as shown in Figure 3.
 
-    -   Trigger configuration – From the drop-down, select ‘CloudWatch
-        logs’.
+    -   Trigger configuration – From the drop-down, select ‘CloudWatch logs’.
 
-    -   Log group – Choose the Log group you noted in Step 4 of
-        the [Prerequisites](#prerequisites). In our setup, the
-        log group for Amazon EKS clusters, deployed in separate AWS
-        accounts, was set with the same value (falco).
+    -   Log group – Choose the Log group you noted in Step 4 of the [Prerequisites](#prerequisites). In our setup, the
+        log group for Amazon EKS clusters, deployed in separate AWS accounts, was set with the same value (falco).
 
-    -   Filter name – Provide a name for the filter, for
-        example falco-events-trigger.
+    -   Filter name – Provide a name for the filter, for example falco-events-trigger.
 
     -   Filter pattern – *optional* – Leave this field blank.
 
@@ -638,11 +614,9 @@ Enable Trigger from the CloudWatch Logs group
  Figure 3: Configuration of Lambda function trigger for CloudWatch Log
  group
 
-1.  Repeat these steps (as applicable) to set up triggers for the Lambda
-    functions deployed in other regions where EKS clusters and
+1.  Repeat these steps (as applicable) to set up triggers for the Lambda functions deployed in other regions where EKS clusters and
     SecurutyHub instances are provisioned.
 
- 
 
 ### Deployment Validation
 
