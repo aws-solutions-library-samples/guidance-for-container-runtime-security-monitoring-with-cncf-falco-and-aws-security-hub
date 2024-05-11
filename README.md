@@ -48,10 +48,9 @@ The solution in this guidance uses [AWS FireLens](https://docs.aws.amazon.com/A
 CloudWatch Logs](http://aws.amazon.com/cloudwatch), and [AWSLambda](http://aws.amazon.com/lambda) to enrich logs from Falco and
 populate Security Hub.
 
-<img src="images/Falco-components-schema.svg" width="50%">
-<!-- ![](images/Falco-components-schema.svg)(width="80%") <br/ -->
-Figure 1: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster
-
+<img src="images/Falco-components-schema.svg" width="40%">
+<b>Figure 1: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster</b>
+<br/>
 Falco provides streaming detection of unexpected behavior, configuration
 changes, and attacks.
 
@@ -66,7 +65,7 @@ Below is the Reference architecture implemented by this guidance .
 
 <!-- ! [](images/falco_eks_integration_architecture_updated.png) -->
 <img src="images/falco_eks_integration_architecture_updated.png" width="70%">
-*Figure 2. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)*
+<b>Figure 2. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)</b>
 
 ### Architecture steps
 
@@ -106,7 +105,7 @@ For successful deployment of guidance code, you should have the following in pla
 
 2.  Amazon EKS cluster(s) deployed in AWS region
 
- **NOTE: Below is the Note for Technical Publishing team in *italics* – need to decide how to reference Related Content from Implementation Guide**
+NOTE: this guidance does not provide code for deplying EKS clusters into your AWS accounts, but multiple examples can be found in this [project repositry](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/)
 
 3. Security Hub instance(s) set up with an Administrator account in the same AWS region(s) as EKS cluster(s).
 
@@ -130,7 +129,8 @@ for one month.
 |Amazon EC2 - Compute Nodes at EKS clusters |	\$656.29 |	Tenancy (Shared Instances), Operating system (Linux), Workload (Consistent, Number of instances: 6), Advance EC2 instance (m7g.xlarge), Pricing strategy (On-Demand Utilization: 90 %Utilized/Month), Enable monitoring (disabled), EBS Storage amount (30 GB), DT Inbound: Not selected (0 TB per month), DT Outbound: Internet (0 GB per month), DT Intra-Region: (0 TB per month)|
 |Application Load Balancer - ALB and NLB for access to EKS K8s API and Application API |	\$33.33 |	Number of Application Load Balancers (2)|
 |Network Load Balancer - ALB and NLB for access to EKS K8s API and Application API|	\$33.45 |	Number of Network Load Balancers (2), Average number of new TCP connections (1 per second), Average TCP connection duration (1 seconds), Processed bytes per NLB for TCP (50 GB per month)|					
-|AWS Security Hub - Regional Security Hub| \$100.004 | Number of Accounts (2), Number of Finding Ingested per Account (1000), Number of Automation Rules (10), Number of criteria in each automation rule (2)|					
+|AWS Security Hub - Regional Security Hub| \$100.00 | Number of Accounts (2), Number of Finding Ingested per Account (1000), Number of Automation Rules (10), Number of criteria in each automation rule (2)|		
+|Amazon CloudWatch - CloudWatch logs with Falco events and metrics | \$60.27 |	Logs Delivered to CloudWatch Logs: Data Ingested (50 GB), Standard Logs: Data Ingested (10 GB), Number of Metrics (includes detailed and custom metrics) (100)|
 |AWS Lambda	- Processing Log events into ASFF records for SecurityHub - across regions | \$0.68 |	Architecture (x86), Architecture (x86), Invoke Mode (Buffered), Amount of ephemeral storage allocated (1024 MB), Number of requests (100 per minute) |					
 |VPN Connection	- VPC for hosting EKS clusters and workloads running on them | \$256 | Working days per month (22), Number of Site-to-Site VPN Connections (0), Number of subnet associations (2) |					
 |Public IPv4 Address - VPC for hosting EKS clusters and workloads running on them| \$7.3 |	Number of In-use public IPv4 addresses (2), Number of Idle public IPv4 addresses (0)|
@@ -289,7 +289,7 @@ node instances. For example, in the example below ‘eks-cluster-1-managed-onde
 
 <img src="images/EKS_node_instance_IAMRole.jpg" width="70%" >
 <!-- ![](images/eks_iam_role.png) <br/-->
-Figure 3. IAM Role attached to EC2 instance of EKS Compute node
+<b>Figure 3. IAM Role attached to EC2 instance of EKS Compute node</b>
 <br/>
 Below is an example of the command to attach required IAM policies to EKS node
 role above:
@@ -464,7 +464,7 @@ To deploy the sample code into your AWS account:
 
 <img src="images/Imported_Lambda_Function.jpg" width="70%">
 <!-- ![](images/DeployedlambdaFunction.png) <br/ -->
-Figure 4: Imported Lambda function for Falco events integration with Security Hub
+<b>Figure 4: Imported Lambda function for Falco events integration with Security Hub</b>
 <br/>
 3. Enable Trigger from the CloudWatch Logs group
 
@@ -480,7 +480,7 @@ Figure 4: Imported Lambda function for Falco events integration with Security Hu
 
  <img src="images/Lambda_trigger_definition.jpg" width="70%" >
  <!-- ![](images/LambdaFunction_Trigger.png) <br/ -->
- Figure 5: Configuration of Lambda function trigger from CloudWatch Log group
+ <b>Figure 5: Configuration of Lambda function trigger from CloudWatch Log group</b>
 <br/>
 NOTE: Repeat these steps (as applicable) to set up triggers for the Lambda functions deployed in other AWS region(s) where EKS cluster(s) and
 SecurutyHub instance(s) are provisioned.
@@ -521,14 +521,14 @@ cat /etc/shadow &gt; /dev/null
 ![](images/cloudwatch_log_part2.png) <br/>
 -->
 <br/>
-Figure 6: CloudWatch Log entries from CNCF Falco processed by Fluentbit/FireLens
+<b>Figure 6: CloudWatch Log entries from CNCF Falco processed by Fluentbit/FireLens</b>
 
 3.  (Optional) To see the log generated by Lambda function that handles new security events appearing in the CloudWatch logs above, you can
     navigate to the */aws/lambda/AwsSecurityhubFalcoEcsEksIn-lambdafunction*-XXXXX Log Group and open one of the entries:
 
 <img src="images/Lambda_function_log.jpg" width="70%" >
 <!-- ![](images/cloudwatch_log_fragment1.png) <br/ -->
-Figure 7: Lambda function logs showing script output statements
+<b>Figure 7: Lambda function logs showing script output statements</b>
 <br/>
 The highlighted debugging message confirms that security event was converted to ASFF format and imported into regional SecurityHub
 instance
@@ -537,20 +537,20 @@ instance
 
 <img src="images/SecurityHub_New_Findings.jpg" width="60%" >
 <!-- ![](images/image9.png) <br/ -->
-Figure 8: Security Findings in regional Security Hub originating from Falco event
+<b>Figure 8: Security Findings in regional Security Hub originating from Falco event</b>
 <br/>
 5. To see more detail of a Security finding, check the box next to the finding in SecurityHub. The figure below shows some of the details for the ‘Read sensitive file by untrusted program’ finding.
 
- <img src="images/SecurityHub_Findings_Details2.jpg" width="60%" >
+ <img src="images/SecurityHub_Findings_Details2.jpg" width="50%" >
 <!-- ![](images/image10.png) <br/ -->
- Figure 9: Read Sensitive file security finding in Security Hub – detailed view
+<b>Figure 9: Read Sensitive file security finding in Security Hub – detailed view</b>
 <br/>
  In the screenshot below, you can see the `Resources` details of above finding  that includes the instance ID of the Amazon EKS cluster node.
  In our example, this is the [Amazon Elastic Compute Cloud (Amazon EC2)](http://aws.amazon.com/ec2) instance.
 
  <img src="images/SecurityHub_Findings_Resources.jpg" width="60%" >
  <!-- ![](images/image11.png) <br/ -->
- Figure 10: Sensitive file read security finding – Resources detail
+ <b>Figure 10: Sensitive file read security finding – Resources detail</b>
 <br/><br/>
 
 #### Review Security findings from all Regions in the aggregated Security Hub
@@ -560,31 +560,31 @@ NOTE: when logged in to regional Security Hub instance, there are links navigati
 
 <img src="images/Security_Hub_Aggregated_Findings.jpg" width="70%" >
 <!-- ![](images/image12.png) <br/-->
-Figure 11: Link to the central SecurityHub instance from a regional one
+<b>Figure 11: Link to the central SecurityHub instance from a regional one</b>
 <br/>
 2.  Navigate to the central (“single pane of glass”) Security Hub instance to review security posture across EKS workloads deployed in
 AWS regions - findings from all aggregated regions are available in that view. The figure below shows security findings from different regions:
 <img src="images/Security_Hub_Aggregated_Findings.jpg" width="60%" >
 <!-- ![](images/image13.png) <br/-->
-Figure 12: Aggregated view of security findings in the “single pane of glass” central Security Hub
+<b>Figure 12: Aggregated view of security findings in the “single pane of glass” central Security Hub</b>
 <br/>
 3. To see more information including AWS Region where EKS cluster where offending container is running, check the box next to the finding. The Figure below shows the region and instance details associated with a specific finding in member account 1.
 
 <img src="images/Security_Hub_Aggregated_Findings_Region.jpg" width="60%" >
 <!-- ![](images/image14.png) <br/ -->
-Figure 13: Security alert caused by sensitive container file under /etc showing AWS region of origin
+<b>Figure 13: Security alert caused by sensitive container file under /etc showing AWS region of origin</b>
 <br/>
 4. To change status of a Security finding (e.g., to track an actual notification to responsible teams for remediations), select one or more security findings using filter such as ‘Company name’ (*AnyCompany* in the example below) etc. and select ‘WorkflowStatus’ option to desired one from the drop-down list to update the status of security remediation workflow:
 
 <img src="images/SecurityHub_Workflow_Notified.jpg" width="70%">
 <!-- ![](images/image15.png) <br/ -->
-Figure 14: Changing security issue response workflow status from the Security Hub aggregated account*
+<b>Figure 14: Changing security issue response workflow status from the Security Hub aggregated account</b>
 <br/>
 Now security findings workflow status will show as ‘Notified” indicating that the teams were notified of those security events. Finding status can be further updated to ‘Resolved’ (if root cause gets addressed) or ‘Suppressed’ (if security team decides that detected security events don’t constitute an actual threat and/or can be reviewed later):
 
 <img src="images/SecurityHub_Findings_Notified.jpg" width="70%">
 <!-- ![](images/image16.png) <br/ -->
-Figure 15: Updated security issues workflow status from the Security Hub aggregated account
+<b>Figure 15: Updated security issues workflow status from the Security Hub aggregated account</b>
 <br/>
 NOTE: updating ‘Workflow Status’ of security findings can be also performed in regional Security Hub instances by authorized users and that status would be reflected in the aggregated Security Hub account as well.
 
@@ -611,7 +611,7 @@ Lambda security log event transformation and import function Python code has bee
 
 <img src="images/Lambda_runtime_environment.jpg" width="70%" >
 <!-- ![](images/image17.png) <br/-->
-Figure 18: Lambda function runtime settings in AWS Console
+<b>Figure 16: Lambda function runtime settings in AWS Console</b>
 <br/><br/>
 NOTE: Setting up “Update runtime version” to Auto should ensure that when Python runtime environment gets deprecated, it would be automatically
 updated for this function which should keep it working.
