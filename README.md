@@ -647,9 +647,9 @@ helm delete falco -n falco
 ```
 4. Uninstall FluentBut/FireLens integration by running the following commands:
 ```bash
-cd <guidance home>/fluent-bit/kubernetes
+cd <guidance home>
 # Delete Fluentbit - FireLens integration
-kubectl delete -f fluent-bit/kubernetes/ -n falco
+kubectl delete -f ./fluent-bit/kubernetes/ -n falco
 ```
 (Optional, only if no longer needed for other workloads) Delete Amazon EKS cluster(s) created as part of the [Prerequisites](#prerequisites).
 
