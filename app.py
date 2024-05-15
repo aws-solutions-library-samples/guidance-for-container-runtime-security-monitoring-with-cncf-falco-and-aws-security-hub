@@ -31,8 +31,8 @@ AwsSecurityhubFalcoEksIntegrationStack(app, "AwsSecurityhubFalcoEksIntegrationSt
 
     #env=core.Environment(account='123456789012', region='us-east-1'),
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    # DZ: TO DO  add SOLUTION ID to description field to generate corresponding field in a Cloud Formation
-    description=" Container Run-time Security monitoring with CNCF Falco and SecurityHub on AWS (SO12345)" 
+    # DZ: added SOLUTION ID to description field in generated Cloud Formation object
+    description=" Container Run-time Security monitoring with CNCF Falco and SecurityHub on AWS (SO9269)" 
     )
 
 app.synth()
