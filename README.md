@@ -116,27 +116,26 @@ NOTE: this guidance does not provide code for deplying EKS clusters into your AW
 
 ### Cost 
 
-You are responsible for the cost of the AWS services used while running this Guidance. As of May 2024, the estimated cost for running this Guidance with two Amazon EKS clusters with 3 [m7g.xlarge](https://aws.amazon.com/ec2/instance-types/m7g/) compute nodes in the US East 1 (N. Virginia) and US East 2 (Ohio) Regions with 2 SecurityHub instances in these regions is approximately **\$1293.32 per month**. Refer to the AWS pricing [calculator]([https://aws.amazon.com/pricing/?aws-products-pricing](https://calculator.aws/#/estimate?id=9c32d5d8a5b6637d5a13eab5d4cb9c99c392d6f8)) for estimates for each AWS service used in this Guidance.
+You are responsible for the cost of the AWS services used while running this Guidance. As of May 2024, the estimated cost for running this Guidance with two Amazon EKS clusters with 3 [c5.xlarge](https://aws.amazon.com/ec2/instance-types/c5/) compute nodes in the US East 1 (N. Virginia) and US East 2 (Ohio) Regions with 2 SecurityHub instances in these regions is approximately **\$1030 per month**. Refer to the AWS pricing [calculator](https://calculator.aws/#/estimate?id=6eca2bbcc1f033234c02d2d9ecbb0af0b826d48b) for detailed estimates for each AWS service used in this Guidance.
 
 ### Sample Cost table
 
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region
+The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the `us-east-1` and `us-east-2` US East Regions
 for one month.
 
 | **AWS service**  |  Cost \[USD\]  |Description |
 |-----------|------------|------------|					
 |Amazon EKS	- Regional EKS clusters |	\$146	| Number of EKS Clusters (2)	|				
-|Amazon EC2 - Compute Nodes at EKS clusters |	\$656.29 |	Tenancy (Shared Instances), Operating system (Linux), Workload (Consistent, Number of instances: 6), Advance EC2 instance (m7g.xlarge), Pricing strategy (On-Demand Utilization: 90 %Utilized/Month), Enable monitoring (disabled), EBS Storage amount (30 GB), DT Inbound: Not selected (0 TB per month), DT Outbound: Internet (0 GB per month), DT Intra-Region: (0 TB per month)|
-|Application Load Balancer - ALB and NLB for access to EKS K8s API and Application API |	\$33.33 |	Number of Application Load Balancers (2)|
-|Network Load Balancer - ALB and NLB for access to EKS K8s API and Application API|	\$33.45 |	Number of Network Load Balancers (2), Average number of new TCP connections (1 per second), Average TCP connection duration (1 seconds), Processed bytes per NLB for TCP (50 GB per month)|					
-|AWS Security Hub - Regional Security Hub| \$100.00 | Number of Accounts (2), Number of Finding Ingested per Account (1000), Number of Automation Rules (10), Number of criteria in each automation rule (2)|		
+|Amazon EC2 - Compute Nodes at 2 EKS clusters |	\$45.15 |	Tenancy (Shared Instances), Operating system (Linux), Workload (Consistent, Number of instances: 6), Advance EC2 instance (c5.xlarge), Pricing strategy (On-Demand Utilization: 90 %Utilized/Month), Enable monitoring (disabled), EBS Storage amount (30 GB), DT Inbound: Not selected (0 TB per month), DT Outbound: Internet (0 GB per month), DT Intra-Region: (0 TB per month)|
+|Network Load Balancer -  Access to EKS K8s API and Application API|	\$66.48 |	Number of Network Load Balancers (2), Average number of new TCP connections (1 per second), Average TCP connection duration (1 seconds), Processed bytes per NLB for TCP (50 GB per month)|					
+|AWS Security Hub - 2 Regional Security Hubs| \$10.00 | Number of Accounts (2), Number of Finding Ingested per Account (10000), Number of Automation Rules (10), Number of criteria in each automation rule (2)|		
 |Amazon CloudWatch - CloudWatch logs with Falco events and metrics | \$60.27 |	Logs Delivered to CloudWatch Logs: Data Ingested (50 GB), Standard Logs: Data Ingested (10 GB), Number of Metrics (includes detailed and custom metrics) (100)|
-|AWS Lambda	- Processing Log events into ASFF records for SecurityHub - across regions | \$0.68 |	Architecture (x86), Architecture (x86), Invoke Mode (Buffered), Amount of ephemeral storage allocated (1024 MB), Number of requests (100 per minute) |					
-|VPN Connection	- VPC for hosting EKS clusters and workloads running on them | \$256 | Working days per month (22), Number of Site-to-Site VPN Connections (0), Number of subnet associations (2) |					
-|Public IPv4 Address - VPC for hosting EKS clusters and workloads running on them| \$7.3 |	Number of In-use public IPv4 addresses (2), Number of Idle public IPv4 addresses (0)|
-|**Total estimated cost per month:**| **\$1293.92** | **deployment in 2 AWS regions**  |
+|AWS Lambda	- Processing Log events into ASFF records for SecurityHub - 2 regions | \$12.68 |	Architecture (x86), Architecture (x86), Invoke Mode (Buffered), Amount of ephemeral storage allocated (1024 MB), Number of requests (100 per minute) |					
+|NAT gateways -2, public IPs - 6 for  EKS clusters	Network Address Translation (NAT) Gateway| \$67.5 |	Number of NAT Gateways (2) |				
+|NAT gateways -2, public IPs - 6 for  EKS clusters	Public IPv4 Address	| \$21.9 |	Number of In-use public IPv4 addresses (6), Number of Idle public IPv4 addresses (0)|
+|**Total estimated cost per month:**| **\$1029.98** | **deployed in 2 AWS regions**  |
 
-NOTE: this is just an estimate, actual Cost depend on footprints of AWS services deployed in production 
+NOTE: this is just an estimate, actual Cost will depend on footprints of AWS services deployed in production 
 
 ## Deployment
 
