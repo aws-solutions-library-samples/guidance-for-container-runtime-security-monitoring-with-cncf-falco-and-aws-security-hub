@@ -50,7 +50,7 @@ populate Security Hub.
 
 <img src="images/Falco-components-schema.svg" width="40%">
 <b>Figure 1: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster</b>
-<br/>
+<br/><br/>
 Falco provides streaming detection of unexpected behavior, configuration
 changes, and attacks.
 
@@ -64,12 +64,12 @@ changes, and attacks.
 Below is the Reference architecture implemented by this guidance .
 
 <!-- ! [](images/falco_eks_integration_architecture_updated.png) -->
-<img src="images/falco_eks_integration_architecture_updated.png" width="70%">
+<img src="images/falco_eks_integration_architecture_updated.jpg" width="80%">
 <b>Figure 2. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)</b>
 
 ### Architecture steps
 
-1. FluentBit /[AWS FireLens](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html) log event aggregation and [Cloud Native Computing Foundations (CNCF) Falco](https://www.cncf.io/projects/falco/) security monitoring components are deployed into [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks) Clusters, running in same or different regions
+1. [FluentBit](https://fluentbit.io/) /[AWS FireLens](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html) log event aggregation and [Cloud Native Computing Foundations (CNCF) Falco](https://www.cncf.io/projects/falco/) security monitoring components are deployed into [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks) Clusters, running in same or different regions
 2. CNCF Falco components monitor application containers running on EKS cluster nodes for possible security incidents (based on defined rules) at run time and  generate security events.
 3. Security events are streamed to FluentBit/AWS FireLens log event aggregators running on EKS as well.
 4. Aggregated security events are imported into [AWS Cloud Watch](https://aws.amazon.com/cloudwatch/) log streams, specified log groups 
@@ -78,7 +78,6 @@ Below is the Reference architecture implemented by this guidance .
 7. Regional Security findings aggregated  into ”single pane of glass” central Security Hub portal that includes regional SecurityHub as members (can be one of the regional Hub instances) 
 8. Security team users authenticate into the ”single pane of glass” central SecurityHub portal via [Amazon Identity and Access Management (IAM)](https://aws.amazon.com/iam/) , access is granted according to their IAM Roles
 9. Aggregated security findings are available in the ”single pane of glass” central SecurityHub portal for acknowledgement and triage using workflows. 
-
 
 ### AWS Services used  in this Guidance
 
