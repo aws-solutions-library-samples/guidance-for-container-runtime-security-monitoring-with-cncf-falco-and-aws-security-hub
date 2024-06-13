@@ -51,8 +51,7 @@ populate Security Hub.
 <img src="images/Falco-components-schema.svg" width="40%">
 <b>Figure 1: Architecture diagram of CNCF Falco continuous runtime security monitoring components in Kubernetes cluster</b>
 <br/><br/>
-Falco provides streaming detection of unexpected behavior, configuration
-changes, and attacks.
+Falco provides streaming detection of unexpected container behavior, configuration changes, and attacks.
 
 -   Uses [eBPF](https://ebpf.io/what-is-ebpf/) to monitor system activity for adverse behavior.
 -   Integrates with Kubernetes, so you can protect your containers  infrastructure at scale.
@@ -63,7 +62,7 @@ changes, and attacks.
 
 Below is the Reference architecture implemented by this guidance .
 
-<!-- ! [](images/falco_eks_integration_architecture_updated.png) -->
+
 <img src="images/falco_eks_integration_architecture_updated.jpg" width="80%">
 <b>Figure 2. Reference architecture of Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)</b>
 
@@ -81,15 +80,15 @@ Below is the Reference architecture implemented by this guidance .
 
 ### AWS Services used  in this Guidance
 
-| **AWS service**  | Description |
-|-----------|------------|
-|[Amazon Security Hub](https://aws.amazon.com/security-hub/)|Core service -  aggregation and management of Security findings|
-|[Amazon Elastic Kubernetes Service - EKS](https://aws.amazon.com/eks/)|Core service -  EKS service is used to run the secured container workloads|
-|[Amazon Virtual Private Cloud - VPC](https://aws.amazon.com/vpc/)| Core Service - Network security layer |
-|[Amazon Elastic Compute Cloud - EC2](https://aws.amazon.com/ec2/)| Core Service - EC2 instance power On Demand and Spot based EKS compute node groups for running container workloads|
-|[Amazon Elastic Container Registry - ECR](https://aws.amazon.com/ecr/)|Core service - ECR registry is used to host application container images|
-|[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)|Core service - stores Falco generated log events  |
-|[Amazon Identity and Access Manager - IAM](https://aws.amazon.com/iam/))|Auxiliary service - provides user credentials and role mgmt  |
+| **AWS service**  | Role | Description |
+|-----------|------------|------------|
+|[Amazon Security Hub](https://aws.amazon.com/security-hub/)| Core service | Aggregation and management of Security findings|
+|[Amazon Elastic Kubernetes Service - EKS](https://aws.amazon.com/eks/)|Core service | EKS service is used to run the secured container workloads|
+|[Amazon Virtual Private Cloud - VPC](https://aws.amazon.com/vpc/)| Core Service | Network security layer |
+|[Amazon Elastic Compute Cloud - EC2](https://aws.amazon.com/ec2/)| Core Service | EC2 instances power On Demand and Spot used for EKS compute node groups for running container workloads|
+|[Amazon Elastic Container Registry - ECR](https://aws.amazon.com/ecr/)|Core service | ECR registry is used to host application container images|
+|[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)|Core service | Collects and stores Falco generated log events  |
+|[Amazon Identity and Access Manager - IAM](https://aws.amazon.com/iam/))|Auxiliary service | provides Identity and Access policy and role mgmt  |
 
 ### Prerequisites
 
@@ -104,11 +103,11 @@ For successful deployment of guidance code, you should have the following in pla
 
 2.  Amazon EKS cluster(s) deployed in AWS region
 
-NOTE: this guidance does not provide code for deplying EKS clusters into your AWS accounts, but multiple examples can be found in this [project repositry](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/)
+NOTE: this guidance does not provide code for deplying EKS clusters into your AWS accounts, but multiple hands-on examples can be found in this [project repositry](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/) or [this one](https://github.com/aws-samples/aws-do-eks)
 
-3. Security Hub instance(s) set up with an Administrator account in the same AWS region(s) as EKS cluster(s).
+3. Amazon Security Hub instance(s) set up with an Administrator account in the same  region(s) as EKS cluster(s).
 
-4. Security Hub instances set up in multiple regions to ingest and  rocess security events from Amazon EKS clusters with workloads. For instructions on how to automatically deploy Amazon EKS cluster with  arious add-ons please see Example and Documentation in the “Related Content” (see above **NOTE** )
+4. Amazon Security Hub instances set up in multiple regions to ingest and  rocess security events from Amazon EKS clusters with workloads. For instructions on how to automatically deploy Amazon EKS cluster with various add-ons please see Example and Documentation in the “Related Content” (see above **NOTE** )
 
 5. AWS Cloud Development Kit (CDK) CLI [installed](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) on
     the member accounts to deploy the solution that provides the custom integration between Falco and Security Hub.
@@ -286,7 +285,7 @@ NOTE: “EKS-NODE-ROLE-NAME” is the IAM role that is attached to the EKS comp
 node instances. For example, in the example below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
 
 <img src="images/EKS_node_instance_IAMRole.jpg" width="70%" >
-<!-- ![](images/eks_iam_role.png) <br/-->
+
 <b>Figure 3. IAM Role attached to EC2 instance of EKS Compute node</b>
 <br/>
 Below is an example of the command to attach required IAM policies to EKS node
@@ -298,7 +297,7 @@ select(.PolicyName == "EKS-CloudWatchLogs") | .Arn'\`
 3. Set up Fluentbit/Amazon FireLens Log Aggregation on EKS Cluster
 
 To preview and update, if necessary, the configuration of Fluentbit/FireLens components, navigate to the `fluent-bit/kubernetes`
-directory and review the configuration files (fluentbit-config-crio.yaml, daemonset.yaml and service-account.yaml) that will be applied.
+directory and review the configuration files (`fluentbit-config-crio.yaml`, `daemonset.yaml` and `service-account.yaml`) that will be applied.
 
 NOTE: you can specify the target AWS region, CloudWatch log group and log stream names by adjusting the following parameters in the file:
 [Fluentbit-config-crio.yaml](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/fluent-bit/kubernetes/fluent-bit-config-crio.yaml)
@@ -346,12 +345,14 @@ helm repo add falcosecurity https://falcosecurity.github.io/charts
 helm repo update
 ```
 
-Falco security monitoring behavior can be controlled by a [configuration parameters](https://github.com/falcosecurity/charts/tree/master/falco#introduction),
+Falco security monitoring behavior can be controlled by a [configuration parameters](https://github.com/falcosecurity/charts/tree/master/charts/falco#introduction),
 which can be supplied as runtime parameters while installing the chart or by creating a special purpose file, for example **values.yaml** (you
-can give any name). Please reference this [page](https://github.com/falcosecurity/charts/tree/master/falco#introduction) to
+can give any name). Please reference this [page](https://github.com/falcosecurity/charts/tree/master/charts/falco) to
 understand all Falco chart configuration parameters, which control the run time behavior of Falco audit level, log level, output formats etc.
 
-NOTE: The `jsonOutput property` is set to `false` in the Falco chart parameter file `values.yaml` by default. You need to set to true for JSON formatted output via Fluentbit as well as related properties. This guidance is not covering customization of Falco audit rules, which is a different important aspect of adopting this highly configurable solution.
+NOTES:
+1. Please note that by cloning and using 3rd party open-source code you assume responsibility for its patching/securing/managing in the context of this project.  
+2. The `jsonOutput property` is set to `false` in the Falco chart parameter file `values.yaml` by default. You need to set it to `true` for JSON formatted output via Fluentbit as well as related properties. This guidance is not covering customization of Falco audit rules, which is a another important aspect of adopting this highly configurable solution.
 
 ```bash
 ...
@@ -372,7 +373,7 @@ json_include_output_property: true
 json_include_tags_property: true
 
 ```
-Please refer to the sample of [values.yaml ](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml) with customizations above in the sample code repository for your reference.
+Please refer to the sample of [values.yaml ](https://github.com/aws-solutions-library-samples/guidance-for-container-runtime-security-monitoring-on-amazon-eks-with-cncf-falco-amazon-securityhub/blob/main/falco-helm-chart/values_customize_sample.yaml) with customizations above for setting up configuration parameters above.
 
 Please note where Falco rules configuration files will be deployed in Falco pods, as specified in parameters in the `values.yaml` file above:
 
@@ -461,7 +462,7 @@ To deploy the sample code into your AWS account:
 2.  Navigate to the [AWS Lambda Console ](https://console.aws.amazon.com/lambda) and confirm that you see the newly created Lambda function. You will use this function in the next section.
 
 <img src="images/Imported_Lambda_Function.jpg" width="70%">
-<!-- ![](images/DeployedlambdaFunction.png) <br/ -->
+
 <b>Figure 4: Imported Lambda function for Falco events integration with Security Hub</b>
 <br/>
 3. Enable Trigger from the CloudWatch Logs group
@@ -501,23 +502,19 @@ the same account. Then you will review the findings.
 #### Test Deployment in AWS Region 1
 
 1.  Run the following commands to simulate hacker attack which should trigger an alert in AWS Region 1, which is running an Amazon EKS
-    cluster. Replace *&lt;pod_name&gt; *with your own value for test pod name
+    cluster. Replace *<pod_name>* with your own value for test pod name
 ```bash
-kubectl -n &lt;namespace&gt; exec -it &lt;pod_name&gt; -- /bin/bash
+kubectl -n namespace exec -it pod_name -- /bin/bash
 touch /etc/1
 touch /etc/2
 touch /etc/3
-cat /etc/shadow &gt; /dev/null
+cat /etc/shadow; /dev/null
 ```
 
 2.  (Optional) To see the log generated by Falco security event pushed to CloudWatch via Amazon Fluentbit/FireLens integration, you can
     take a look in the *falco* Log Group, *alerts_eks* folder contents and review Log entries generated after simulation of container hacking:
 
 <img src="images/CloudWatch_log_entry.jpg" width="70%">
-<!--
-![](images/cloudwatch_log_part1.png) <br/>
-![](images/cloudwatch_log_part2.png) <br/>
--->
 <br/>
 <b>Figure 6: CloudWatch Log entries from CNCF Falco processed by Fluentbit/FireLens</b>
 
@@ -525,7 +522,6 @@ cat /etc/shadow &gt; /dev/null
     navigate to the */aws/lambda/AwsSecurityhubFalcoEcsEksIn-lambdafunction*-XXXXX Log Group and open one of the entries:
 
 <img src="images/Lambda_function_log.jpg" width="70%" >
-<!-- ![](images/cloudwatch_log_fragment1.png) <br/ -->
 <b>Figure 7: Lambda function logs showing script output statements</b>
 <br/>
 The highlighted debugging message confirms that security event was converted to ASFF format and imported into regional SecurityHub
@@ -540,14 +536,13 @@ instance
 5. To see more detail of a Security finding, check the box next to the finding in SecurityHub. The figure below shows some of the details for the ‘Read sensitive file by untrusted program’ finding.
 
  <img src="images/SecurityHub_Findings_Details2.jpg" width="50%" >
-<!-- ![](images/image10.png) <br/ -->
+
 <b>Figure 9: Read Sensitive file security finding in Security Hub – detailed view</b>
 <br/>
  In the screenshot below, you can see the `Resources` details of above finding  that includes the instance ID of the Amazon EKS cluster node.
  In our example, this is the [Amazon Elastic Compute Cloud (Amazon EC2)](http://aws.amazon.com/ec2) instance.
 
  <img src="images/SecurityHub_Findings_Resources.jpg" width="60%" >
- <!-- ![](images/image11.png) <br/ -->
  <b>Figure 10: Sensitive file read security finding – Resources detail</b>
 <br/><br/>
 
@@ -557,31 +552,27 @@ instance
 NOTE: when logged in to regional Security Hub instance, there are links navigating to the "central" as shown at the top of the screen like shown below:
 
 <img src="images/Security_Hub_Aggregated_Findings.jpg" width="70%" >
-<!-- ![](images/image12.png) <br/-->
 <b>Figure 11: Link to the central SecurityHub instance from a regional one</b>
 <br/>
 2.  Navigate to the central (“single pane of glass”) Security Hub instance to review security posture across EKS workloads deployed in
 AWS regions - findings from all aggregated regions are available in that view. The figure below shows security findings from different regions:
 <img src="images/Security_Hub_Aggregated_Findings.jpg" width="60%" >
-<!-- ![](images/image13.png) <br/-->
 <b>Figure 12: Aggregated view of security findings in the “single pane of glass” central Security Hub</b>
 <br/>
 3. To see more information including AWS Region where EKS cluster where offending container is running, check the box next to the finding. The Figure below shows the region and instance details associated with a specific finding in member account 1.
 
-<img src="images/Security_Hub_Aggregated_Findings_Region.jpg" width="60%" >
-<!-- ![](images/image14.png) <br/ -->
+<img src="images/Security_Hub_Aggregated_Findings_Region.jpg" width="50%" >
 <b>Figure 13: Security alert caused by sensitive container file under /etc showing AWS region of origin</b>
 <br/>
 4. To change status of a Security finding (e.g., to track an actual notification to responsible teams for remediations), select one or more security findings using filter such as ‘Company name’ (*AnyCompany* in the example below) etc. and select ‘WorkflowStatus’ option to desired one from the drop-down list to update the status of security remediation workflow:
 
 <img src="images/SecurityHub_Workflow_Notified.jpg" width="70%">
-<!-- ![](images/image15.png) <br/ -->
+
 <b>Figure 14: Changing security issue response workflow status from the Security Hub aggregated account</b>
 <br/>
 Now security findings workflow status will show as ‘Notified” indicating that the teams were notified of those security events. Finding status can be further updated to ‘Resolved’ (if root cause gets addressed) or ‘Suppressed’ (if security team decides that detected security events don’t constitute an actual threat and/or can be reviewed later):
 
 <img src="images/SecurityHub_Findings_Notified.jpg" width="70%">
-<!-- ![](images/image16.png) <br/ -->
 <b>Figure 15: Updated security issues workflow status from the Security Hub aggregated account</b>
 <br/>
 NOTE: updating ‘Workflow Status’ of security findings can be also performed in regional Security Hub instances by authorized users and that status would be reflected in the aggregated Security Hub account as well.
