@@ -91,36 +91,7 @@ def create_ec2_instance_resource(instance):
 # Retrieve details of EKS Falco log message entry obtained from 'ouput_fields element'
 
 def get_eks_details(message):
-
-# sample log section format
-#   "account_id": "133776528597",
-#    "ami_id": "ami-07bccaac087171156",
-#    "az": "us-west-2c",
-#    "ec2_instance_id": "i-0bd0513a0350fa1f8",
-#    "ec2_instance_type": "t3.xlarge",
-#    "hostname": "ip-10-0-12-47.us-west-2.compute.internal",
-#    "log": "{\"hostname\":\"falco-zgmm8\",\"output\":\ 
-# ....
-#.  "output_fields": {
-#        "container.id": "f687a1640776",
-#        "container.image.repository": "docker.io/library/nginx",
-#        "evt.time": 1677545313548344774,
-#        "fd.name": "/etc/671",
-#        "k8s.ns.name": "default",
-#        "k8s.pod.name": "nginx-test2",
-#        "proc.aname[2]": null,
-#        "proc.aname[3]": null,
-#        "proc.aname[4]": null,
-#        "proc.cmdline": "touch /etc/671",
-#        "proc.name": "touch",
-#        "proc.pcmdline": "bash",
-#        "proc.pid": 31576,
-#        "proc.pname": "bash",
-#        "user.loginuid": -1,
-#        "user.name": "<NA>"
-#    }
-#  
-    
+   
     fields = None
     try: 
        #fields = log["output_fields"]
@@ -132,7 +103,6 @@ def get_eks_details(message):
       
     finally:
        #print("CHECK: get_eks_details got output_fields: ", fields)  
-       # print("-------------------------------------------------------------------------")
        logging.info("")
     
     #Initialize container metadata to placeholder parameters
@@ -319,10 +289,6 @@ def lambda_handler(event, context):
 # OPTIONAL new function to parse out in "log" field JSON substring to remove esscaped '\"'
 def parseJSON(source): 
 
-   #"log": "2023-02-02T00:43:56.734263328Z stdout F {\"hostname\":\"falco-z95gm\",\"output\":\"21:17:02.642052704: Error File below /etc opened for writing 
-   # (user=<NA> user_loginuid=-1 command=touch /etc/26 pid=22583 parent=bash pcmdline=bash file=/etc/26 program=touch gparent=<NA> ggparent=<NA> gggparent=<NA> 
-   #
-   # res = source[idx1: idx2+2] # idx2+1 b/c we need the 2nd closing }}
    res = source.replace('\"','"')
    # printing result
    logging.warning("DEBUG: parseJSON - The extracted CLEAN LOG JSON Data type, values are: ", type(res), res)
