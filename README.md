@@ -262,7 +262,7 @@ Navigate to directory `fluent-bit` - you will find two directories called `aws`
 
 `aws` – this is the directory that contains IAM policy called `iam_role_policy.json`, which you will attach to the compute node IAM role which is automatically attached to the compute nodes when deploy an EKS cluster. This policy will give Falco running on the EKS compute nodes ability to send/stream logs to Amazon CloudWatch.
 
-`kubernetes` – this directory has three files: configmap.yaml, daemonset.yaml, and service-account.yaml. These files will be applied to create a ConfigMap for Fluent Bit configuration, DaemonSet to run pods on all compute nodes, and finally a Service Account for the RBAC clusterrole for authorization. All the files can be applied all at once or one by one using `kubectl apply` command
+`kubernetes` – this directory has three files: `configmap.yaml`, `daemonset.yaml`, and `service-account.yaml`. These files will be applied to create a ConfigMap for Fluent Bit configuration, DaemonSet to run pods on all compute nodes, and finally a Service Account for the RBAC clusterrole for authorization. All the files can be applied all at once or one by one using `kubectl apply` command
 
 2. Set up IAM Permissions for Falco
 
