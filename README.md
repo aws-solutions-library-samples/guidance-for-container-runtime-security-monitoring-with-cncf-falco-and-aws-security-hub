@@ -278,7 +278,7 @@ aws iam attach-role-policy --role-name <EKS-NODE-ROLE-NAME> --policy-arn `aws ia
 NOTE: “EKS-NODE-ROLE-NAME” is the IAM role that is attached to the EKS compute nodes. You can find the role attached by checking any of EC2
 node instances. For example, in the example below ‘eks-cluster-1-managed-ondemand’ is the role attached the node:
 
-<img src="images/EKS_node_instance_IAMRole.jpg" width="70%" >
+<img src="images/EKS_node_instance_IAMRole_masked.jpg" width="70%" >
 
 <b>Figure 3. IAM Role attached to EC2 instance of EKS Compute node</b>
 <br/>
