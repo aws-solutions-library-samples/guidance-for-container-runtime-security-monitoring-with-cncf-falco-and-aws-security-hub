@@ -60,7 +60,7 @@ Falco provides streaming detection of unexpected container behavior, configurati
 
 Below is the Reference architecture implemented by this guidance:
 
-<img src="images/falco_eks_integration_architecture_updated.png" width="90%">
+<img src="images/container-runtime-security-monitoring-with-cncf-falco-and-aws-security-hub-architecture.png" width="90%">
 
 <b>Figure 2. Reference architecture of Container Runtime Security Monitoring on Amazon EKS with Falco</b>
 <br/>
@@ -466,7 +466,7 @@ To deploy the sample code into your AWS account:
     -   Filter pattern – *optional* – Leave this field blank.
 
  <img src="images/Lambda_trigger_definition_masked.jpg" width="70%" >
- <b>Figure 5: Configuration of Lambda function trigger from CloudWatch Log group</b>
+<b>Figure 5: Configuration of Lambda function trigger from CloudWatch Log group</b>
 <br/>
 NOTE: Repeat these steps (as applicable) to set up triggers for the Lambda functions deployed in other AWS region(s) where EKS cluster(s) and SecurutyHub instance(s) are provisioned.
 
