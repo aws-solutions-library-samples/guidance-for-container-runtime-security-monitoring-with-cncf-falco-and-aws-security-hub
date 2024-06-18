@@ -3,7 +3,6 @@
     - [Architecture](#architecture)
     - [Cost](#cost)
 3. [Prerequisites](#prerequisites)
-    
 4. [Deployment Steps](#deployment)
 5. [Deployment Validation](#deployment-validation)
 6. [Support and Troubleshooting](#support-and-troubleshooting)
@@ -616,7 +615,7 @@ kubectl delete -f ./fluent-bit/kubernetes/ -n falco
 ```
 (Optional, only if no longer needed for other workloads) Delete Amazon EKS cluster(s) created as part of the [Prerequisites](#prerequisites).
 
-## Security
+## Security Issues
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
@@ -626,7 +625,7 @@ This project is licensed under the MIT-0 License. See the [LICENSE](LICENSE) fil
 
 ## Disclaimer
 
-This sample code should not be used in production accounts, on production workloads, or on production or other critical data. You are responsible for testing, securing, and optimizing the sample code as appropriate for production-grade use based on your specific quality control practice and standards.
+This guidance sample code should not be used in production accounts, on production workloads, or on production or other critical data. You are responsible for testing, securing, and optimizing the sample code as appropriate for production-grade use based on your specific quality control practice and standards.
 
 ## References
 
