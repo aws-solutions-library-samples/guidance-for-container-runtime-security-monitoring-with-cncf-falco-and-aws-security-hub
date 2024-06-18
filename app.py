@@ -9,13 +9,12 @@ from aws_cdk import core as cdk
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
-# from aws_securityhub_falco_ecs_eks_integration.aws_securityhub_falco_ecs_eks_integration_stack import AwsSecurityhubFalcoEcsEksIntegrationStack
 # update: use new Python package and function names
 from aws_securityhub_falco_eks_integration.aws_securityhub_falco_eks_integration_stack import AwsSecurityhubFalcoEksIntegrationStack
 
 app = core.App()
-# AwsSecurityhubFalcoEcsEksIntegrationStack(app, "AwsSecurityhubFalcoEcsEksIntegrationStack",
-# removed referenced to ECS
+
+# Updated app name 
 AwsSecurityhubFalcoEksIntegrationStack(app, "AwsSecurityhubFalcoEksIntegrationStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
@@ -26,12 +25,12 @@ AwsSecurityhubFalcoEksIntegrationStack(app, "AwsSecurityhubFalcoEksIntegrationSt
 
     #env=core.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
 
-    # Uncomment the next line if you know exactly what Account and Region you
+    # Uncomment and modify the next line if you know exactly what Account and Region you
     # want to deploy the stack to. */
-
     #env=core.Environment(account='123456789012', region='us-east-1'),
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    # DZ: added SOLUTION ID to description field in generated Cloud Formation object
+                                       
+    # added SOLUTION ID to description field in generated Cloud Formation object
     description=" Container Run-time Security monitoring with CNCF Falco and SecurityHub on AWS (SO9269)" 
     )
 
