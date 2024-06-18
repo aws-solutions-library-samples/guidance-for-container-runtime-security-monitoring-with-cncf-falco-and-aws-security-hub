@@ -15,7 +15,7 @@ Container Runtime Security Monitoring on Amazon Elastic Kubernetes Service (EKS)
 Customers want a single and comprehensive view of the security posture of their cloud native workloads. Runtime security event monitoring is important to
 running secure, operationally excellent, and reliable workloads,especially in environments that run containers and container
 orchestration platforms. In this guidance, we show you how to useservices such as [AWS Security
-Hub](https://aws.amazon.com/security-hub/) and [Falco](https://falco.org/),a [Cloud Native Computing Foundation](https://www.cncf.io/) project, to build a continuous container runtime security monitoring solution.
+Hub](https://aws.amazon.com/security-hub/) and [Falco](https://falco.org/), a [Cloud Native Computing Foundation](https://www.cncf.io/) project, to build a continuous container runtime security monitoring solution.
 
 With this solution in place, you can collect runtime security findingsfrom multiple AWS regions running one or more containerized workloads on
 AWS container orchestration platforms, such as [Amazon ElasticKubernetes Service (Amazon EKS)](https://aws.amazon.com/eks/) . The solution collates container run-time security findings across thoseregions into a designated account where you can have a unified view ofSecurity posture across regions and container workloads.
@@ -616,6 +616,24 @@ kubectl delete -f ./fluent-bit/kubernetes/ -n falco
 ```
 (Optional, only if no longer needed for other workloads) Delete Amazon EKS cluster(s) created as part of the [Prerequisites](#prerequisites).
 
+## Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
 ## License
 
-This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
+This project is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
+
+## Disclaimer
+
+This sample code should not be used in production accounts, on production workloads, or on production or other critical data. You are responsible for testing, securing, and optimizing the sample code as appropriate for production-grade use based on your specific quality control practice and standards.
+
+## References
+
+* [Kubernetes](https://kubernetes.io)
+* [CNCF Falco project](https://falco.org/)
+* [Amazon Web Services (AWS)](https://aws.amazon.com/)
+* [Amazon EC2 Instance Types](https://aws.amazon.com/ec2/instance-types/)
+* [Amazon Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks)
+* [Amazon Security Hub](https://aws.amazon.com/security-hub/)
+
