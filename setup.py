@@ -6,7 +6,7 @@ with open("README.md") as fp:
 
 
 setuptools.setup(
-    name="aws_securityhub_falco_ecs_eks_integration",
+    name="aws_securityhub_falco_eks_integration",
     #DZ: updated version
     version="0.0.2",
 
@@ -15,9 +15,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
 
     author="author",
-
-    #package_dir={"": "aws_securityhub_falco_ecs_eks_integration"},
-    #packages=setuptools.find_packages(where="aws_securityhub_falco_ecs_eks_integration"),
     
     #updated source code directory structure 
     package_dir={"": "aws_securityhub_falco_eks_integration"},
